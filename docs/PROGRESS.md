@@ -1,130 +1,153 @@
-# Project Progress - {{PROJECT_NAME}}
+# Project Progress - WebOS
 
-**Last Updated**: {{DATETIME}}
-**Current Phase**: {{CURRENT_PHASE}}
-**Overall Progress**: {{OVERALL_PROGRESS}}%
+**Last Updated:** 2026-03-27
+**Current Phase:** Phase 3: Productivity Suite
+**Overall Progress:** 30%
 
 ---
 
 ## Progress Summary
 
-| Phase | Status | Progress | Start Date | Target Date |
-|-------|--------|----------|------------|-------------|
-| Phase 1: Foundation | {{STATUS}} | {{PROGRESS}}% | {{START}} | {{TARGET}} |
-| Phase 2: Planning | {{STATUS}} | {{PROGRESS}}% | {{START}} | {{TARGET}} |
-| Phase 3: Architecture | {{STATUS}} | {{PROGRESS}}% | {{START}} | {{TARGET}} |
-| Phase 4: Implementation | {{STATUS}} | {{PROGRESS}}% | {{START}} | {{TARGET}} |
-| Phase 5: Testing | {{STATUS}} | {{PROGRESS}}% | {{START}} | {{TARGET}} |
-| Phase 6: Deployment | {{STATUS}} | {{PROGRESS}}% | {{START}} | {{TARGET}} |
+| Phase | Status | Description |
+|-------|--------|-------------|
+| Phase 1: Foundation & Shell | **Complete** | Desktop, windows, dock, theme, command palette, apps, persistence |
+| Phase 2: Core Capabilities | **Complete** | Capability registry, command bus, xterm.js terminal, system monitor |
+| Phase 3: Productivity Suite | Planned | Notes, tasks/kanban, PDF viewer, calendar |
+| Phase 4: Development Tools | Planned | IDE, git UI, API explorer |
+| Phase 5: Communication | Planned | Chat interface |
+| Phase 6: AI Control Plane | Planned | AI tool schema, AI chat panel, automation |
+| Phase 7: Advanced Capabilities | Planned | Browser, image viewer, media player |
 
 ---
 
-## Current Sprint
+## Phase 1: Foundation & Shell - Complete
 
-**Sprint**: {{SPRINT_NUMBER}}
-**Dates**: {{SPRINT_START}} - {{SPRINT_END}}
-**Focus**: {{SPRINT_FOCUS}}
+### 1.1 Project Scaffolding
+- Vite + React 19 + TypeScript
+- Tailwind CSS v4, TanStack Router, Zustand
+- Vitest + Testing Library
+- ESLint + Prettier
+- Cloudflare Pages deployment config
 
-### Sprint Goals
+### 1.2 Theme System
+- CSS custom property design tokens (dark/light)
+- 4 built-in gradient wallpapers
+- Theme toggle (dark/light)
 
-1. {{SPRINT_GOAL_1}}
-2. {{SPRINT_GOAL_2}}
-3. {{SPRINT_GOAL_3}}
+### 1.3 Window Manager
+- Draggable, resizable windows with title bar
+- macOS traffic light buttons (close, minimize, maximize)
+- Z-index stacking, focus management
+- Singleton app support
+- Minimize/maximize/restore with pre-maximize bounds
 
-### Sprint Backlog
+### 1.4 Desktop + Dock
+- Full-screen desktop with wallpaper
+- Desktop icons with drag-and-drop
+- macOS-style dock with magnification
+- System tray (clock, theme toggle)
+- Right-click context menu
 
-| Task | Status | Assignee | Estimated | Actual |
-|------|--------|----------|-----------|--------|
-| {{TASK_1}} | {{STATUS}} | {{ASSIGNEE}} | {{EST}} | {{ACTUAL}} |
-| {{TASK_2}} | {{STATUS}} | {{ASSIGNEE}} | {{EST}} | {{ACTUAL}} |
-| {{TASK_3}} | {{STATUS}} | {{ASSIGNEE}} | {{EST}} | {{ACTUAL}} |
+### 1.5 Command Palette + Notifications + App Launcher
+- Ctrl+K command palette with fuzzy search
+- Toast notifications (type-based auto-dismiss)
+- App launcher grid with category tabs
+
+### 1.6 Settings + Basic Apps
+- Settings panel (theme, accent colors, wallpaper)
+- Calculator (keyboard support)
+- About system info panel
+- Text editor (tabbed, line numbers, status bar)
+- Terminal (built-in shell commands)
+- File Manager (grid/list view, favorites sidebar)
+
+### 1.7 Persistence & Storage
+- Virtual File System (VFS) backed by IndexedDB
+  - Full CRUD: readFile, writeFile, deletePath
+  - Directories: createDirectory, listDirectory, recursive delete
+  - Metadata: stat, exists, normalizePath, parentPath, baseName
+  - Operations: movePath, copyFile
+  - MIME type detection
+  - Default directory structure
+- IndexedDB persistence for Zustand stores
+  - Theme preferences persisted (dark/light + wallpaper)
+  - Pinned apps persisted
+  - Recent commands persisted
+  - 300ms debounce on writes
+
+### 1.8 Build & Deploy
+- Production build (16 chunks, ~148KB gzip)
+- Deployed to Cloudflare Pages
+- SPA fallback via `_redirects`
+- Security headers via `_headers`
 
 ---
 
-## Recent Activity
+## Phase 2: Core Capabilities - Complete
 
-### Completed (Last 7 Days)
+### 2.1 Capability Registry
+- [x] Capability manifest schema (name, id, version, permissions, commands)
+- [x] Register/unregister capabilities
+- [x] Capability discovery API (getCapability, listCapabilities, findCommand)
+- [x] Permission request/grant system with configurable handler
+- [x] Enable/disable capabilities
+- [x] Namespaced command lookup (capabilityId.commandId)
+- 26 tests
 
-{{COMPLETED_ITEMS}}
+### 2.2 Command Bus
+- [x] Global command bus (publish/subscribe event system)
+- [x] Command → capability function routing
+- [x] Command source tracking (gui, keyboard, terminal, ai, internal)
+- [x] Command history (capped at 100 entries)
+- [x] Undo/redo support with attachable undo functions
+- [x] Async command execution with error handling
+- 25 tests
 
-### In Progress
+### 2.3 Terminal (xterm.js)
+- [x] xterm.js integration with FitAddon
+- [x] Enhanced shell command parser (separate testable module)
+- [x] Built-in shell commands (ls, cd, cat, mkdir, touch, rm, echo, clear, help, pwd, whoami, uname, date, mv, cp, stat, ls -a)
+- [x] Tab completion (commands and file paths)
+- [x] Command history (up/down arrows)
+- [x] Terminal themes (dark theme matching OS)
+- [x] Ctrl+C cancel, Ctrl+L clear screen
+- [x] ResizeObserver auto-fit
+- 40 tests
 
-{{IN_PROGRESS_ITEMS}}
-
-### Blocked
-
-{{BLOCKED_ITEMS}}
+### 2.4 System Monitor
+- [x] System overview (platform, uptime, window counts)
+- [x] Open windows list with title, app, size, state
+- [x] Registered capabilities with version, command count, status
+- [x] Storage usage (IndexedDB quota with progress bar)
+- [x] Registered apps listing
+- [x] Auto-refreshing storage usage (5s interval)
 
 ---
 
 ## Metrics
 
-### Code Quality
-
-- **Test Coverage**: {{COVERAGE}}%
-- **Linting Issues**: {{LINT_ISSUES}}
-- **Code Smells**: {{CODE_SMELLS}}
-- **Technical Debt**: {{TECH_DEBT}} hours
-
-### Development Velocity
-
-- **Tasks Completed (Week)**: {{TASKS_COMPLETED}}
-- **Tasks Completed (Sprint)**: {{SPRINT_COMPLETED}}/{{SPRINT_TOTAL}}
-- **Average Task Duration**: {{AVG_DURATION}} hours
-
-### Build & Deploy
-
-- **Last Successful Build**: {{LAST_BUILD}}
-- **Build Success Rate**: {{BUILD_SUCCESS}}%
-- **Deployment Frequency**: {{DEPLOY_FREQ}}
+- **Tests**: 159 passing (10 test files)
+- **Build**: Successful (16 chunks, ~148KB gzip)
+- **Deployment**: Cloudflare Pages at webos-aiv.pages.dev
 
 ---
 
-## Issues & Blockers
+## Changelog
 
-### Active Blockers
+### 2026-03-27 (Phase 2)
+- Added Capability Registry (manifest schema, discovery, permissions)
+- Added Command Bus (pub/sub, routing, history, undo/redo)
+- Upgraded Terminal to xterm.js (tab completion, history, themes)
+- Added System Monitor app (windows, capabilities, storage)
+- 91 new tests (159 total)
 
-| Issue | Impact | Owner | Status | Resolution Target |
-|-------|--------|-------|--------|-------------------|
-| {{BLOCKER_1}} | {{HIGH|MED|LOW}} | {{OWNER}} | {{STATUS}} | {{TARGET}} |
+### 2026-03-27 (Phase 1.7)
+- Added persistence and storage layer
+- VFS with IndexedDB-backed filesystem
+- Zustand store persistence (theme, pinned apps, recent commands)
+- Terminal upgraded with real VFS commands
+- File Manager upgraded with real VFS
 
-### Open Issues
-
-- {{ISSUE_1}} ({{SEVERITY}})
-- {{ISSUE_2}} ({{SEVERITY}})
-- {{ISSUE_3}} ({{SEVERITY}})
-
----
-
-## Upcoming
-
-### Next Sprint Goals
-
-{{NEXT_SPRINT_GOALS}}
-
-### Planned Features
-
-{{UPCOMING_FEATURES}}
-
-### Releases
-
-| Version | Target Date | Features |
-|---------|-------------|----------|
-| {{VERSION_1}} | {{DATE}} | {{FEATURES}} |
-| {{VERSION_2}} | {{DATE}} | {{FEATURES}} |
-
----
-
-## Notes
-
-{{PROGRESS_NOTES}}
-
----
-
-## Changelog Summary
-
-### Recent Changes
-
-{{RECENT_CHANGES}}
-
-See [CHANGELOG.md](../CHANGELOG.md) for full history.
+### 2026-03-27 (earlier)
+- Completed Phase 1.1-1.6 and 1.8
+- Initial deployment to Cloudflare Pages
