@@ -1,249 +1,299 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { listDirectory, readFile, writeFile, createDirectory, deletePath, exists } from '@/storage';
+import { useRef, useEffect, useCallback, useState } from 'react';
+import { Terminal } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
+import '@xterm/xterm/css/xterm.css';
+import {
+  parseCommandLine,
+  tabComplete,
+} from './shell';
+import type { ShellContext } from './shell';
 
-interface TerminalLine {
-  type: 'output' | 'input' | 'error';
-  text: string;
-}
+// ---------------------------------------------------------------------------
+// Theme
+// ---------------------------------------------------------------------------
 
-const WELCOME: TerminalLine[] = [
-  { type: 'output', text: 'WebOS Terminal v0.2.0' },
-  { type: 'output', text: 'Type \'help\' for available commands.\n' },
-];
+const TERMINAL_THEME = {
+  background: '#0d0d0d',
+  foreground: '#e0e0e0',
+  cursor: '#22c55e',
+  cursorAccent: '#0d0d0d',
+  selectionBackground: '#334155',
+  black: '#0d0d0d',
+  red: '#f87171',
+  green: '#22c55e',
+  yellow: '#facc15',
+  blue: '#60a5fa',
+  magenta: '#c084fc',
+  cyan: '#22d3ee',
+  white: '#e0e0e0',
+  brightBlack: '#6b7280',
+  brightRed: '#f87171',
+  brightGreen: '#4ade80',
+  brightYellow: '#fde047',
+  brightBlue: '#93c5fd',
+  brightMagenta: '#d8b4fe',
+  brightCyan: '#67e8f9',
+  brightWhite: '#f3f4f6',
+};
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 export default function TerminalApp() {
-  const [lines, setLines] = useState<TerminalLine[]>(WELCOME);
-  const [input, setInput] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const termRef = useRef<Terminal | null>(null);
+  const fitAddonRef = useRef<FitAddon | null>(null);
   const [cwd, setCwd] = useState('/Home');
-  const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const cwdRef = useRef('/Home');
+  const commandHistoryRef = useRef<string[]>([]);
+  const historyIndexRef = useRef(-1);
+  const inputBufferRef = useRef('');
+  const isRunningRef = useRef(false);
 
-  /* Auto-scroll to bottom */
+  // Keep cwdRef in sync
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [lines]);
-
-  /* Focus input on mount */
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  const resolvePath = useCallback((path: string): string => {
-    if (path.startsWith('/')) return path;
-    if (path === '..') {
-      const parts = cwd.split('/').filter(Boolean);
-      parts.pop();
-      return '/' + parts.join('/');
-    }
-    if (path.startsWith('./')) path = path.slice(2);
-    const parts = path.split('/');
-    const result = cwd === '/' ? [''] : cwd.split('/');
-    for (const part of parts) {
-      if (part === '..') {
-        result.pop();
-      } else if (part && part !== '.') {
-        result.push(part);
-      }
-    }
-    return result.join('/') || '/';
+    cwdRef.current = cwd;
   }, [cwd]);
 
-  const processCommand = useCallback(async (cmd: string) => {
-    const trimmed = cmd.trim();
-    const parts = trimmed.split(/\s+/);
-    const command = parts[0]?.toLowerCase() ?? '';
-    const args = parts.slice(1);
+  // Initialize xterm
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-    const newLines: TerminalLine[] = [
-      { type: 'input', text: `${cwd} $ ${trimmed}` },
-    ];
+    const term = new Terminal({
+      theme: TERMINAL_THEME,
+      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+      fontSize: 13,
+      lineHeight: 1.2,
+      cursorBlink: true,
+      cursorStyle: 'block',
+      allowProposedApi: true,
+      scrollback: 5000,
+    });
 
-    if (!command) {
-      // Empty input
-    } else if (command === 'clear') {
-      setLines([]);
+    const fitAddon = new FitAddon();
+    term.loadAddon(fitAddon);
+    term.open(containerRef.current);
+
+    // Small delay for layout, then fit
+    requestAnimationFrame(() => {
+      fitAddon.fit();
+    });
+
+    termRef.current = term;
+    fitAddonRef.current = fitAddon;
+
+    // Welcome message
+    term.writeln('\x1b[1;32mWebOS Terminal v1.0.0\x1b[0m');
+    term.writeln("Type 'help' for available commands.\r");
+
+    // Write initial prompt
+    writePrompt(term, cwdRef.current);
+
+    return () => {
+      fitAddon.dispose();
+      term.dispose();
+      termRef.current = null;
+      fitAddonRef.current = null;
+    };
+  }, []);
+
+  // Handle resize
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      fitAddonRef.current?.fit();
+    });
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Handle input
+  useEffect(() => {
+    const term = termRef.current;
+    if (!term) return;
+
+    const disposable = term.onData(async (data) => {
+      if (isRunningRef.current) return;
+
+      if (data === '\r') {
+        // Enter — execute command
+        await handleEnter(term);
+      } else if (data === '\x7f') {
+        // Backspace
+        if (inputBufferRef.current.length > 0) {
+          inputBufferRef.current = inputBufferRef.current.slice(0, -1);
+          term.write('\b \b');
+        }
+      } else if (data === '\t') {
+        // Tab completion
+        await handleTab(term);
+      } else if (data === '\x03') {
+        // Ctrl+C — cancel current input
+        term.writeln('^C');
+        writePrompt(term, cwdRef.current);
+        inputBufferRef.current = '';
+        historyIndexRef.current = -1;
+      } else if (data === '\x0c') {
+        // Ctrl+L — clear screen
+        term.clear();
+        writePrompt(term, cwdRef.current);
+      } else if (data === '\x1b[A') {
+        // Arrow up — history
+        navigateHistory(term, -1);
+      } else if (data === '\x1b[B') {
+        // Arrow down — history
+        navigateHistory(term, 1);
+      } else if (data >= ' ' && !data.startsWith('\x1b')) {
+        // Regular character
+        inputBufferRef.current += data;
+        term.write(data);
+      }
+    });
+
+    return () => disposable.dispose();
+  }, []);
+
+  // --- Helpers ---
+
+  function writePrompt(term: Terminal, cwd: string): void {
+    const displayPath = cwd === '/Home' ? '~' : cwd.startsWith('/Home/') ? '~' + cwd.slice(4) : cwd;
+    term.write(`\x1b[32m${displayPath}\x1b[0m \x1b[1;33m$\x1b[0m `);
+  }
+
+  function navigateHistory(term: Terminal, direction: number): void {
+    const history = commandHistoryRef.current;
+    if (history.length === 0) return;
+
+    const newIndex = historyIndexRef.current + direction;
+
+    if (newIndex < 0) {
+      // Below oldest — show current input
+      if (historyIndexRef.current >= 0) {
+        clearCurrentLine(term);
+        inputBufferRef.current = '';
+        historyIndexRef.current = -1;
+        writePrompt(term, cwdRef.current);
+      }
       return;
-    } else if (command === 'help') {
-      newLines.push({ type: 'output', text: `Available commands:
-  help       Show this help message
-  clear      Clear the terminal
-  echo       Echo arguments
-  date       Show current date and time
-  whoami     Show current user
-  uname      Show system information
-  pwd        Print working directory
-  cd [path]  Change directory
-  ls [path]  List directory contents
-  cat <file> Show file contents
-  mkdir <dir> Create directory
-  touch <file> Create empty file
-  rm <path>  Delete file or directory` });
-    } else if (command === 'echo') {
-      newLines.push({ type: 'output', text: args.join(' ') });
-    } else if (command === 'date') {
-      newLines.push({ type: 'output', text: new Date().toLocaleString() });
-    } else if (command === 'whoami') {
-      newLines.push({ type: 'output', text: 'webos-user' });
-    } else if (command === 'uname') {
-      newLines.push({ type: 'output', text: 'WebOS 0.2.0 - A programmable, multimodal, AI-controllable runtime platform' });
-    } else if (command === 'pwd') {
-      newLines.push({ type: 'output', text: cwd });
-    } else if (command === 'cd') {
-      const target = args[0] ? resolvePath(args[0]) : '/Home';
-      if (await exists(target)) {
-        setCwd(target);
-      } else {
-        newLines.push({ type: 'error', text: `cd: no such directory: ${args[0] ?? '/'}` });
-      }
-    } else if (command === 'ls') {
-      try {
-        const target = args[0] ? resolvePath(args[0]) : cwd;
-        const entries = await listDirectory(target);
-        if (entries.length === 0) {
-          newLines.push({ type: 'output', text: '(empty)' });
-        } else {
-          const plain = entries.map((e) => (e.type === 'directory' ? `${e.name}/` : e.name));
-          newLines.push({ type: 'output', text: plain.join('  ') });
-        }
-      } catch (err) {
-        newLines.push({ type: 'error', text: `ls: ${err instanceof Error ? err.message : String(err)}` });
-      }
-    } else if (command === 'cat') {
-      if (!args[0]) {
-        newLines.push({ type: 'error', text: 'cat: missing file operand' });
-      } else {
-        try {
-          const target = resolvePath(args[0]);
-          const content = await readFile(target);
-          newLines.push({ type: 'output', text: content });
-        } catch (err) {
-          newLines.push({ type: 'error', text: `cat: ${err instanceof Error ? err.message : String(err)}` });
-        }
-      }
-    } else if (command === 'mkdir') {
-      if (!args[0]) {
-        newLines.push({ type: 'error', text: 'mkdir: missing operand' });
-      } else {
-        try {
-          const target = resolvePath(args[0]);
-          await createDirectory(target);
-        } catch (err) {
-          newLines.push({ type: 'error', text: `mkdir: ${err instanceof Error ? err.message : String(err)}` });
-        }
-      }
-    } else if (command === 'touch') {
-      if (!args[0]) {
-        newLines.push({ type: 'error', text: 'touch: missing file operand' });
-      } else {
-        try {
-          const target = resolvePath(args[0]);
-          if (!(await exists(target))) {
-            await writeFile(target, '');
-          }
-        } catch (err) {
-          newLines.push({ type: 'error', text: `touch: ${err instanceof Error ? err.message : String(err)}` });
-        }
-      }
-    } else if (command === 'rm') {
-      if (!args[0]) {
-        newLines.push({ type: 'error', text: 'rm: missing operand' });
-      } else {
-        try {
-          const target = resolvePath(args[0]);
-          await deletePath(target);
-        } catch (err) {
-          newLines.push({ type: 'error', text: `rm: ${err instanceof Error ? err.message : String(err)}` });
-        }
-      }
+    }
+
+    if (newIndex >= history.length) {
+      // Above newest — clear
+      clearCurrentLine(term);
+      inputBufferRef.current = '';
+      historyIndexRef.current = history.length;
+      writePrompt(term, cwdRef.current);
+      return;
+    }
+
+    // Save current input when first navigating up
+    if (historyIndexRef.current === -1) {
+      // Save the current unsent input (not needed for basic impl)
+    }
+
+    historyIndexRef.current = newIndex;
+    clearCurrentLine(term);
+    inputBufferRef.current = history[newIndex];
+    writePrompt(term, cwdRef.current);
+    term.write(history[newIndex]);
+  }
+
+  function clearCurrentLine(term: Terminal): void {
+    const promptLen = getPromptLength(cwdRef.current);
+    term.write(`\r\x1b[${promptLen + 1}C\x1b[K`);
+  }
+
+  function getPromptLength(cwd: string): number {
+    const displayPath = cwd === '/Home' ? '~' : cwd.startsWith('/Home/') ? '~' + cwd.slice(4) : cwd;
+    return displayPath.length + 3; // "path $ "
+  }
+
+  async function handleTab(term: Terminal): Promise<void> {
+    const completion = await tabComplete(inputBufferRef.current, cwdRef.current);
+    if (!completion) return;
+
+    if (completion.includes('  ')) {
+      // Multiple matches — show them
+      term.writeln('');
+      term.writeln(completion);
+      writePrompt(term, cwdRef.current);
+      term.write(inputBufferRef.current);
     } else {
-      newLines.push({
-        type: 'error',
-        text: `command not found: ${command}`,
-      });
+      // Single match — replace input
+      clearCurrentLine(term);
+      inputBufferRef.current = completion.trimEnd();
+      writePrompt(term, cwdRef.current);
+      term.write(inputBufferRef.current);
     }
+  }
 
-    setLines((prev) => [...prev, ...newLines]);
-    if (trimmed) {
-      setCommandHistory((prev) => [...prev, trimmed]);
-      setHistoryIndex(-1);
-    }
-  }, [cwd, resolvePath]);
+  async function handleEnter(term: Terminal): Promise<void> {
+    const input = inputBufferRef.current;
+    term.writeln('');
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
-        processCommand(input);
-        setInput('');
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        if (commandHistory.length === 0) return;
-        const newIndex =
-          historyIndex === -1
-            ? commandHistory.length - 1
-            : Math.max(0, historyIndex - 1);
-        setHistoryIndex(newIndex);
-        setInput(commandHistory[newIndex]);
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (historyIndex === -1) return;
-        const newIndex = historyIndex + 1;
-        if (newIndex >= commandHistory.length) {
-          setHistoryIndex(-1);
-          setInput('');
-        } else {
-          setHistoryIndex(newIndex);
-          setInput(commandHistory[newIndex]);
-        }
-      } else if (e.key === 'l' && e.ctrlKey) {
-        e.preventDefault();
-        setLines([]);
+    if (input.trim()) {
+      commandHistoryRef.current.push(input);
+      historyIndexRef.current = commandHistoryRef.current.length;
+      isRunningRef.current = true;
+
+      try {
+        await executeCommand(term, input);
+      } catch (err) {
+        term.writeln(`\x1b[31mError: ${err instanceof Error ? err.message : String(err)}\x1b[0m`);
       }
-    },
-    [input, processCommand, commandHistory, historyIndex],
-  );
+
+      isRunningRef.current = false;
+    }
+
+    inputBufferRef.current = '';
+    historyIndexRef.current = commandHistoryRef.current.length;
+    writePrompt(term, cwdRef.current);
+  }
+
+  async function executeCommand(term: Terminal, input: string): Promise<void> {
+    const { command, args } = parseCommandLine(input);
+
+    if (!command) return;
+
+    if (command === 'clear') {
+      term.clear();
+      return;
+    }
+
+    // Dynamic import to avoid circular deps
+    const { getCommand } = await import('./shell');
+    const cmd = getCommand(command);
+
+    if (!cmd) {
+      term.writeln(`\x1b[31mcommand not found: ${command}\x1b[0m`);
+      return;
+    }
+
+    const ctx: ShellContext = {
+      get cwd() { return cwdRef.current; },
+      setCwd(newCwd) { setCwd(newCwd); },
+      write(data) { term.writeln(data); },
+      writeError(data) { term.writeln(`\x1b[31m${data}\x1b[0m`); },
+    };
+
+    await cmd.execute(args, ctx);
+  }
+
+  // Copy/paste support
+  const handleContainerClick = useCallback(() => {
+    termRef.current?.focus();
+  }, []);
 
   return (
     <div
-      className="flex h-full w-full flex-col overflow-hidden bg-[#0d0d0d] font-mono text-sm"
-      onClick={() => inputRef.current?.focus()}
-    >
-      {/* Output area */}
-      <div className="flex-1 overflow-y-auto p-3">
-        {lines.map((line, i) => (
-          <div
-            key={i}
-            className={`whitespace-pre-wrap leading-relaxed ${
-              line.type === 'input'
-                ? 'text-[#c0c0c0]'
-                : line.type === 'error'
-                  ? 'text-[#f87171]'
-                  : 'text-[#e0e0e0]'
-            }`}
-          >
-            {line.text}
-          </div>
-        ))}
-
-        {/* Input line */}
-        <div className="flex items-center leading-relaxed">
-          <span className="shrink-0 text-[#22c55e]">{cwd} $ </span>
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent font-mono text-sm text-[#e0e0e0] outline-none"
-            spellCheck={false}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-          />
-        </div>
-        <div ref={bottomRef} />
-      </div>
-    </div>
+      ref={containerRef}
+      className="h-full w-full"
+      onClick={handleContainerClick}
+      style={{ padding: '4px' }}
+    />
   );
 }
