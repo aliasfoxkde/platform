@@ -179,6 +179,17 @@ const BUILTIN_APPS: AppDefinition[] = [
     minWidth: 600,
     minHeight: 400,
   },
+  {
+    id: 'chat',
+    title: 'Chat',
+    icon: '💬',
+    category: 'communication',
+    component: 'chat',
+    defaultWidth: 700,
+    defaultHeight: 520,
+    minWidth: 400,
+    minHeight: 300,
+  },
 ];
 
 interface AppState {

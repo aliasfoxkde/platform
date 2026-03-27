@@ -17,6 +17,7 @@ const appComponents: Record<string, ComponentType> = {
   ide: lazy(() => import('@/apps/ide/IDEApp')),
   git: lazy(() => import('@/apps/git/GitApp')),
   apiexplorer: lazy(() => import('@/apps/apiexplorer/APIExplorerApp')),
+  chat: lazy(() => import('@/apps/chat/ChatApp')),
 };
 
 /**
