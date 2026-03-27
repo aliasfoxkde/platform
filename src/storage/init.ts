@@ -12,6 +12,10 @@ import { useThemeStore } from '@/shell/stores/themeStore';
 import { useAppStore } from '@/shell/stores/appStore';
 import { useCommandPaletteStore } from '@/shell/stores/commandPaletteStore';
 
+// Register built-in capabilities (side-effect import)
+import '@/capabilities/registered';
+import { registerAppCommands } from '@/shell/commands/appCommands';
+
 let initialized = false;
 
 export async function initStorage(): Promise<void> {
@@ -29,4 +33,7 @@ export async function initStorage(): Promise<void> {
 
   // Persist recent commands
   persistStore(useCommandPaletteStore, 'command-palette', ['recentCommandIds']);
+
+  // Register app-specific command palette entries
+  registerAppCommands();
 }
