@@ -17,6 +17,10 @@
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
     "@tanstack/react-router": "^1.130.13",
+    "@tiptap/extension-placeholder": "^3.21.0",
+    "@tiptap/pm": "^3.21.0",
+    "@tiptap/react": "^3.21.0",
+    "@tiptap/starter-kit": "^3.21.0",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/addon-web-links": "^0.11.0",
     "@xterm/xterm": "^5.5.0",
