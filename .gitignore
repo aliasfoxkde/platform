@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+dist-ssr/
+build/
+out/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.tmp/
+tmp/
+temp/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment
+*.local
+.env
+.env.*
+!.env.example
+
+# Cloudflare
+.wrangler/
+.vercel/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# AI / Claude
+.claude/
+CLAUDE.md
+
+# Next.js (not used but prevent accidental inclusion)
+.next/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
