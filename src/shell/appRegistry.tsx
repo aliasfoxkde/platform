@@ -8,6 +8,7 @@ const appComponents: Record<string, ComponentType> = {
   settings: lazy(() => import('@/apps/settings/SettingsApp')),
   calculator: lazy(() => import('@/apps/calculator/CalculatorApp')),
   about: lazy(() => import('@/apps/about/AboutApp')),
+  monitor: lazy(() => import('@/apps/monitor/MonitorApp')),
 };
 
 /**

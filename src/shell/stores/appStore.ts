@@ -70,6 +70,17 @@ const BUILTIN_APPS: AppDefinition[] = [
     singleton: true,
   },
   {
+    id: 'monitor',
+    title: 'System Monitor',
+    icon: '📊',
+    category: 'system',
+    component: 'monitor',
+    defaultWidth: 560,
+    defaultHeight: 480,
+    minWidth: 400,
+    minHeight: 300,
+  },
+  {
     id: 'browser',
     title: 'Browser',
     icon: '🌐',
@@ -104,7 +115,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set, get) => ({
   apps: BUILTIN_APPS,
-  pinnedApps: ['terminal', 'editor', 'filemanager', 'settings', 'calculator', 'browser', 'notes'],
+  pinnedApps: ['terminal', 'editor', 'filemanager', 'settings', 'calculator', 'browser', 'notes', 'monitor'],
   registerApp: (app) =>
     set((state) => {
       if (state.apps.some((a) => a.id === app.id)) return state;
