@@ -11,6 +11,7 @@ const appComponents: Record<string, ComponentType> = {
   monitor: lazy(() => import('@/apps/monitor/MonitorApp')),
   notes: lazy(() => import('@/apps/notes/NotesApp')),
   tasks: lazy(() => import('@/apps/tasks/TaskManagerApp')),
+  pdfviewer: lazy(() => import('@/apps/pdfviewer/PDFViewerApp')),
 };
 
 /**
