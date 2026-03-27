@@ -1,8 +1,8 @@
 # Project Progress - WebOS
 
 **Last Updated:** 2026-03-27
-**Current Phase:** Phase 3: Productivity Suite (Complete)
-**Overall Progress:** 40%
+**Current Phase:** Phase 4: Development Tools (Complete)
+**Overall Progress:** 50%
 
 ---
 
@@ -13,7 +13,7 @@
 | Phase 1: Foundation & Shell | **Complete** | Desktop, windows, dock, theme, command palette, apps, persistence |
 | Phase 2: Core Capabilities | **Complete** | Capability registry, command bus, xterm.js terminal, system monitor |
 | Phase 3: Productivity Suite | **Complete** | Notes, tasks/kanban, PDF viewer, calendar, clipboard |
-| Phase 4: Development Tools | Planned | IDE, git UI, API explorer |
+| Phase 4: Development Tools | **Complete** | IDE (Monaco), Git UI, API explorer |
 | Phase 5: Communication | Planned | Chat interface |
 | Phase 6: AI Control Plane | Planned | AI tool schema, AI chat panel, automation |
 | Phase 7: Advanced Capabilities | Planned | Browser, image viewer, media player |
@@ -175,6 +175,43 @@
 
 ---
 
+## Phase 4: Development Tools - Complete
+
+### 4.1 IDE (Monaco Editor)
+- [x] Monaco Editor integration with VS-dark theme
+- [x] File tree sidebar (recursive, collapsible directories)
+- [x] Multi-tab editor with view state persistence
+- [x] Syntax highlighting for 20+ languages
+- [x] File search across all VFS directories
+- [x] Integrated terminal panel (ls, cd, cat, mkdir, touch, rm, pwd, echo, clear)
+- [x] Minimap, word wrap, bracket pair colorization
+- [x] Keyboard shortcuts (Ctrl+S save, Ctrl+N new, Ctrl+P search)
+- [x] VFS-backed file operations (open, save, create, delete)
+
+### 4.2 Git UI
+- [x] File status view (staged/unstaged, added/modified/deleted/untracked)
+- [x] Stage/unstage individual files or all
+- [x] Commit message input with staged file count
+- [x] Commit history with expandable details
+- [x] Branch management (create, switch, delete)
+- [x] HEAD indicator and branch list
+- [x] Simulated diff panel
+- [x] Persisted to localStorage
+
+### 4.3 API Explorer
+- [x] HTTP method selector (GET, POST, PUT, DELETE, PATCH)
+- [x] URL input with Enter-to-send
+- [x] Request headers editor (add, remove, toggle)
+- [x] Request body editor
+- [x] Response viewer (formatted JSON, status, headers)
+- [x] Response tabs (Body/Headers)
+- [x] Request history with click-to-reload
+- [x] Duration and size metrics
+- [x] Cancel request support
+- [x] Persisted history to localStorage (up to 50 entries)
+
+---
+
 ## Metrics
 
 - **Tests**: 159 passing (10 test files)
@@ -184,6 +221,12 @@
 ---
 
 ## Changelog
+
+### 2026-03-27 (Phase 4)
+- Added IDE with Monaco Editor (file tree, tabs, search, terminal, VFS)
+- Added Git UI (changes view, commit history, branch management)
+- Added API Explorer (HTTP methods, headers, body, history)
+- Registered all new apps in appRegistry and appStore
 
 ### 2026-03-27 (Phase 3)
 - Added Notes app (Tiptap rich text editor, VFS persistence)

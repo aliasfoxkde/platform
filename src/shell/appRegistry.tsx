@@ -14,6 +14,9 @@ const appComponents: Record<string, ComponentType> = {
   pdfviewer: lazy(() => import('@/apps/pdfviewer/PDFViewerApp')),
   calendar: lazy(() => import('@/apps/calendar/CalendarApp')),
   clipboard: lazy(() => import('@/apps/clipboard/ClipboardApp')),
+  ide: lazy(() => import('@/apps/ide/IDEApp')),
+  git: lazy(() => import('@/apps/git/GitApp')),
+  apiexplorer: lazy(() => import('@/apps/apiexplorer/APIExplorerApp')),
 };
 
 /**
