@@ -18,6 +18,8 @@ const appComponents: Record<string, ComponentType> = {
   git: lazy(() => import('@/apps/git/GitApp')),
   apiexplorer: lazy(() => import('@/apps/apiexplorer/APIExplorerApp')),
   chat: lazy(() => import('@/apps/chat/ChatApp')),
+  aiassistant: lazy(() => import('@/apps/aiassistant/AIAssistantApp')),
+  automation: lazy(() => import('@/apps/automation/AutomationApp')),
 };
 
 /**

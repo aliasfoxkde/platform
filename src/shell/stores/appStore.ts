@@ -190,6 +190,28 @@ const BUILTIN_APPS: AppDefinition[] = [
     minWidth: 400,
     minHeight: 300,
   },
+  {
+    id: 'aiassistant',
+    title: 'AI Assistant',
+    icon: '🤖',
+    category: 'system',
+    component: 'aiassistant',
+    defaultWidth: 600,
+    defaultHeight: 700,
+    minWidth: 400,
+    minHeight: 500,
+  },
+  {
+    id: 'automation',
+    title: 'Automation',
+    icon: '⚡',
+    category: 'system',
+    component: 'automation',
+    defaultWidth: 800,
+    defaultHeight: 600,
+    minWidth: 600,
+    minHeight: 400,
+  },
 ];
 
 interface AppState {

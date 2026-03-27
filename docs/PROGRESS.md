@@ -1,8 +1,8 @@
 # Project Progress - WebOS
 
 **Last Updated:** 2026-03-27
-**Current Phase:** Phase 5: Communication (Complete)
-**Overall Progress:** 55%
+**Current Phase:** Phase 6: AI Control Plane (Complete)
+**Overall Progress:** 60%
 
 ---
 
@@ -15,7 +15,7 @@
 | Phase 3: Productivity Suite | **Complete** | Notes, tasks/kanban, PDF viewer, calendar, clipboard |
 | Phase 4: Development Tools | **Complete** | IDE (Monaco), Git UI, API explorer |
 | Phase 5: Communication | **Complete** | Chat interface |
-| Phase 6: AI Control Plane | Planned | AI tool schema, AI chat panel, automation |
+| Phase 6: AI Control Plane | **Complete** | AI tool schema, AI chat panel, automation |
 | Phase 7: Advanced Capabilities | Planned | Browser, image viewer, media player |
 
 ---
@@ -227,15 +227,50 @@
 
 ---
 
+## Phase 6: AI Control Plane - Complete
+
+### 6.1 AI Tool Schema
+- [x] OpenAI-compatible function calling schema generation from capability registry
+- [x] System prompt generation with OS context (open apps, windows, theme, capabilities)
+- [x] Context gathering from window store and app store
+- [x] Tool call execution via command bus routing
+- [x] ToolDefinition and AIContext type exports
+
+### 6.2 AI Chat Panel
+- [x] OpenAI-compatible API integration (configurable endpoint, key, model)
+- [x] Multi-turn conversation with history persistence
+- [x] Tool calling flow (AI returns tool_calls → execute → feed results back)
+- [x] Streaming response support
+- [x] Three tabs: Chat, Tools (view schemas), Settings
+- [x] Config stored in VFS (`/Home/AI/config.json`)
+- [x] Conversation history in VFS (`/Home/AI/history.json`)
+
+### 6.3 Automation Engine
+- [x] Trigger types: manual, on_app_open, on_interval
+- [x] Actions: open_app, close_app, write_file, show_notification, run_command
+- [x] Quick-start templates (welcome notification, file backup, auto-open apps)
+- [x] Run log with timestamps and status
+- [x] Enable/disable automations
+- [x] Edit and delete automations
+- [x] VFS persistence (`/Home/Automations/automations.json`, `/Home/Automations/log.json`)
+
+---
+
 ## Metrics
 
 - **Tests**: 159 passing (10 test files)
-- **Build**: Successful (14 chunks + vendor, ~375KB gzip total)
+- **Build**: Successful (18 chunks + vendor, ~395KB gzip total)
 - **Deployment**: Cloudflare Pages at webos-aiv.pages.dev
 
 ---
 
 ## Changelog
+
+### 2026-03-27 (Phase 6)
+- Added AI Tool Schema (OpenAI-compatible tool definitions from capability registry)
+- Added AI Assistant (chat panel with tool calling, streaming, configurable API)
+- Added Automation Engine (triggers, actions, templates, run log, VFS persistence)
+- Registered aiassistant and automation apps in appRegistry and appStore
 
 ### 2026-03-27 (Phase 5)
 - Added Chat interface (conversations, emoji picker, simulated replies, VFS persistence)
