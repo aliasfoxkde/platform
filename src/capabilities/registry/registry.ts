@@ -9,7 +9,6 @@ import type {
   CapabilityManifest,
   CommandHandler,
   CommandSchema,
-  Permission,
   PermissionDecision,
   PermissionRequest,
   PermissionScope,

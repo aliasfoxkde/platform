@@ -8,7 +8,6 @@
  */
 
 import { findCommand } from '../registry/registry';
-import type { PermissionScope } from '../registry/types';
 import type {
   CommandBusEvent,
   CommandBusListener,

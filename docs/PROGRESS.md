@@ -1,8 +1,8 @@
 # Project Progress - WebOS
 
 **Last Updated:** 2026-03-27
-**Current Phase:** Phase 3: Productivity Suite
-**Overall Progress:** 30%
+**Current Phase:** Phase 3: Productivity Suite (Complete)
+**Overall Progress:** 40%
 
 ---
 
@@ -12,7 +12,7 @@
 |-------|--------|-------------|
 | Phase 1: Foundation & Shell | **Complete** | Desktop, windows, dock, theme, command palette, apps, persistence |
 | Phase 2: Core Capabilities | **Complete** | Capability registry, command bus, xterm.js terminal, system monitor |
-| Phase 3: Productivity Suite | Planned | Notes, tasks/kanban, PDF viewer, calendar |
+| Phase 3: Productivity Suite | **Complete** | Notes, tasks/kanban, PDF viewer, calendar, clipboard |
 | Phase 4: Development Tools | Planned | IDE, git UI, API explorer |
 | Phase 5: Communication | Planned | Chat interface |
 | Phase 6: AI Control Plane | Planned | AI tool schema, AI chat panel, automation |
@@ -124,15 +124,75 @@
 
 ---
 
+## Phase 3: Productivity Suite - Complete
+
+### 3.1 Notes App
+- [x] Rich text editor (Tiptap with StarterKit + Placeholder)
+- [x] Note organization with sidebar list
+- [x] Search across notes
+- [x] Markdown heading extraction for titles
+- [x] Auto-save with 500ms debounce to VFS (`/Home/Notes/*.md`)
+- [x] Toolbar (Bold, Italic, Strike, H1-H3, Lists, Code Block)
+- [x] Create, edit, delete notes
+
+### 3.2 Task Manager / Kanban
+- [x] Kanban board (To Do, In Progress, Done columns)
+- [x] List view with search and priority filter
+- [x] Task CRUD via modal form
+- [x] Priority levels (low, medium, high) with color coding
+- [x] Due date support
+- [x] Progress bar showing task distribution
+- [x] Auto-save to VFS (`/Home/Tasks/board.json`)
+
+### 3.3 PDF Viewer
+- [x] PDF rendering (pdfjs-dist with canvas)
+- [x] Page navigation
+- [x] Zoom (25%-400%, 25% steps)
+- [x] Rotation (90° increments)
+- [x] HiDPI/Retina support via devicePixelRatio
+- [x] Drag-and-drop + file picker
+
+### 3.4 Calendar
+- [x] Month view (6-week grid, event dots, click to day)
+- [x] Week view (7-day × 24-hour grid)
+- [x] Day view (timeline with all-day events, sidebar list)
+- [x] Event creation (title, date, time, description, color)
+- [x] Event editing and deletion
+- [x] Event detail panel
+- [x] Navigation (previous/next month, today)
+- [x] View mode toggle (month/week/day)
+- [x] Auto-save to VFS (`/Home/Calendar/events.json`)
+
+### 3.5 Clipboard Manager
+- [x] Clipboard history (auto-capture every 2s)
+- [x] Pin frequently used items
+- [x] Search history
+- [x] Filter tabs (all, pinned, recent)
+- [x] Click to copy, expand/collapse long entries
+- [x] Clear unpinned items
+- [x] Manual capture button
+- [x] Persisted to localStorage (up to 100 entries)
+
+---
+
 ## Metrics
 
 - **Tests**: 159 passing (10 test files)
-- **Build**: Successful (16 chunks, ~148KB gzip)
+- **Build**: Successful (14 chunks + vendor, ~375KB gzip total)
 - **Deployment**: Cloudflare Pages at webos-aiv.pages.dev
 
 ---
 
 ## Changelog
+
+### 2026-03-27 (Phase 3)
+- Added Notes app (Tiptap rich text editor, VFS persistence)
+- Added Task Manager with Kanban board and list view
+- Added PDF Viewer (pdfjs-dist, HiDPI, zoom/rotate)
+- Added Calendar (month/week/day views, event CRUD)
+- Added Clipboard Manager (auto-capture, pin, search, filters)
+- Registered all new apps in appRegistry and appStore
+- Updated PROGRESS.md
 
 ### 2026-03-27 (Phase 2)
 - Added Capability Registry (manifest schema, discovery, permissions)

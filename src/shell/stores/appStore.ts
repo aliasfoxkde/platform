@@ -102,6 +102,50 @@ const BUILTIN_APPS: AppDefinition[] = [
     minWidth: 320,
     minHeight: 400,
   },
+  {
+    id: 'tasks',
+    title: 'Tasks',
+    icon: '✅',
+    category: 'productivity',
+    component: 'tasks',
+    defaultWidth: 800,
+    defaultHeight: 560,
+    minWidth: 600,
+    minHeight: 400,
+  },
+  {
+    id: 'pdfviewer',
+    title: 'PDF Viewer',
+    icon: '📄',
+    category: 'productivity',
+    component: 'pdfviewer',
+    defaultWidth: 700,
+    defaultHeight: 600,
+    minWidth: 400,
+    minHeight: 300,
+  },
+  {
+    id: 'calendar',
+    title: 'Calendar',
+    icon: '📅',
+    category: 'productivity',
+    component: 'calendar',
+    defaultWidth: 780,
+    defaultHeight: 560,
+    minWidth: 500,
+    minHeight: 400,
+  },
+  {
+    id: 'clipboard',
+    title: 'Clipboard',
+    icon: '📋',
+    category: 'utilities',
+    component: 'clipboard',
+    defaultWidth: 420,
+    defaultHeight: 520,
+    minWidth: 320,
+    minHeight: 300,
+  },
 ];
 
 interface AppState {
@@ -115,7 +159,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set, get) => ({
   apps: BUILTIN_APPS,
-  pinnedApps: ['terminal', 'editor', 'filemanager', 'settings', 'calculator', 'browser', 'notes', 'monitor'],
+  pinnedApps: ['terminal', 'editor', 'filemanager', 'settings', 'calculator', 'browser', 'notes', 'tasks', 'monitor', 'calendar'],
   registerApp: (app) =>
     set((state) => {
       if (state.apps.some((a) => a.id === app.id)) return state;

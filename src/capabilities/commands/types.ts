@@ -53,7 +53,7 @@ export interface HistoryEntry {
 // Subscriptions
 // ---------------------------------------------------------------------------
 
-type Unsubscribe = () => void;
+export type Unsubscribe = () => void;
 
 export interface CommandBusEvent {
   type: 'before-execute' | 'after-execute' | 'error';
