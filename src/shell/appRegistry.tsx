@@ -20,6 +20,9 @@ const appComponents: Record<string, ComponentType> = {
   chat: lazy(() => import('@/apps/chat/ChatApp')),
   aiassistant: lazy(() => import('@/apps/aiassistant/AIAssistantApp')),
   automation: lazy(() => import('@/apps/automation/AutomationApp')),
+  browser: lazy(() => import('@/apps/browser/BrowserApp')),
+  imageviewer: lazy(() => import('@/apps/imageviewer/ImageViewerApp')),
+  mediaplayer: lazy(() => import('@/apps/mediaplayer/MediaPlayerApp')),
 };
 
 /**

@@ -1,8 +1,8 @@
 # Project Progress - WebOS
 
 **Last Updated:** 2026-03-27
-**Current Phase:** Phase 6: AI Control Plane (Complete)
-**Overall Progress:** 60%
+**Current Phase:** Phase 7: Advanced Capabilities (Complete)
+**Overall Progress:** 65%
 
 ---
 
@@ -16,7 +16,7 @@
 | Phase 4: Development Tools | **Complete** | IDE (Monaco), Git UI, API explorer |
 | Phase 5: Communication | **Complete** | Chat interface |
 | Phase 6: AI Control Plane | **Complete** | AI tool schema, AI chat panel, automation |
-| Phase 7: Advanced Capabilities | Planned | Browser, image viewer, media player |
+| Phase 7: Advanced Capabilities | **Complete** | Browser, image viewer, media player |
 
 ---
 
@@ -256,15 +256,59 @@
 
 ---
 
+## Phase 7: Advanced Capabilities - Complete
+
+### 7.1 Browser-in-Browser
+- [x] Sandboxed iframe browser
+- [x] URL bar with search (Google fallback for non-URLs)
+- [x] Tab management (create, close, switch)
+- [x] Navigation (back, forward, refresh, home)
+- [x] Bookmarks (add/remove, default bookmarks, side panel)
+- [x] Browsing history (side panel with timestamps)
+- [x] Loading indicator (spinner + progress bar)
+- [x] Status bar with URL and tab count
+
+### 7.2 Image Viewer
+- [x] Zoom (mouse wheel, +/- buttons, reset)
+- [x] Pan (click-drag when zoomed)
+- [x] Gallery sidebar with thumbnails
+- [x] Rotate (clockwise/counter-clockwise)
+- [x] Flip (horizontal/vertical)
+- [x] Fit modes (fit, fill, 1:1 original)
+- [x] Drag-and-drop + file picker
+- [x] Keyboard shortcuts (arrows, +/-, R, G, Delete)
+- [x] Navigation arrows for multi-image
+- [x] Image info overlay
+
+### 7.3 Media Player
+- [x] Audio and video playback
+- [x] Playlist with search, add, remove, clear
+- [x] Playback controls (play/pause, seek, skip prev/next)
+- [x] Volume control with mute toggle
+- [x] Shuffle and repeat (none/all/one)
+- [x] Audio visualizer (Web Audio API frequency bars)
+- [x] Now playing overlay for audio tracks
+- [x] Drag-and-drop + file picker
+- [x] Keyboard shortcuts (Space, arrows, N/P, M, L)
+- [x] Track type indicators (audio/video)
+
+---
+
 ## Metrics
 
 - **Tests**: 159 passing (10 test files)
-- **Build**: Successful (18 chunks + vendor, ~395KB gzip total)
+- **Build**: Successful (21 chunks + vendor, ~405KB gzip total)
 - **Deployment**: Cloudflare Pages at webos-aiv.pages.dev
 
 ---
 
 ## Changelog
+
+### 2026-03-27 (Phase 7)
+- Added Browser-in-Browser (sandboxed iframe, tabs, bookmarks, history, navigation)
+- Added Image Viewer (zoom, pan, gallery, rotate, flip, fit modes, drag-and-drop)
+- Added Media Player (audio/video, playlist, controls, visualizer, shuffle/repeat)
+- Registered browser, imageviewer, mediaplayer apps in appRegistry and appStore
 
 ### 2026-03-27 (Phase 6)
 - Added AI Tool Schema (OpenAI-compatible tool definitions from capability registry)
