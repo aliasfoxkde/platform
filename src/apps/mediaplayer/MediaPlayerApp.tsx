@@ -3,6 +3,8 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { ToolbarButton, Toolbar, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -443,26 +445,24 @@ export default function MediaPlayerApp() {
   if (tracks.length === 0) {
     return (
       <div
-        className="flex flex-col items-center justify-center h-full bg-[hsl(var(--surface))] text-[hsl(var(--text-secondary))] gap-4 select-none"
+        className="h-full bg-[hsl(var(--surface))]"
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >
-        <div className="w-20 h-20 rounded-2xl bg-[hsl(var(--surface-secondary))] flex items-center justify-center">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <polygon points="10,8 16,12 10,16" fill="currentColor" />
-          </svg>
-        </div>
-        <div className="text-center">
-          <p className="text-lg font-medium text-[hsl(var(--text))]">Media Player</p>
-          <p className="text-sm mt-1">Drop audio or video files here</p>
-        </div>
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="px-4 py-2 bg-[hsl(var(--accent))] text-white rounded-lg text-sm hover:opacity-90 transition-opacity"
-        >
-          Open Files
-        </button>
+        <EmptyState
+          icon={<Icon name="play" size={40} />}
+          title="Media Player"
+          description="Drop audio or video files here"
+          action={
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-4 py-2 bg-[hsl(var(--accent))] text-white rounded-lg text-sm hover:opacity-90 transition-opacity"
+            >
+              Open Files
+            </button>
+          }
+          className="h-full"
+        />
         <input
           ref={fileInputRef}
           type="file"
@@ -471,7 +471,7 @@ export default function MediaPlayerApp() {
           className="hidden"
           onChange={(e) => e.target.files && loadFiles(e.target.files)}
         />
-        <div className="text-xs text-[hsl(var(--text-secondary))]/60 mt-2">
+        <div className="text-xs text-[hsl(var(--text-secondary))]/60 text-center mt-2 pb-4">
           Space: play/pause, Arrows: seek/volume, N/P: skip, M: mute
         </div>
       </div>
@@ -548,10 +548,7 @@ export default function MediaPlayerApp() {
                 </div>
               ) : (
                 <div className="w-16 h-16 rounded-2xl bg-[hsl(var(--surface-secondary))] flex items-center justify-center mb-4 mx-auto">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <circle cx="12" cy="12" r="10" />
-                    <polygon points="10,8 16,12 10,16" fill="currentColor" />
-                  </svg>
+                  <Icon name="play" size={32} />
                 </div>
               )}
               <p className="text-white text-lg font-medium truncate max-w-xs">{activeTrack?.name}</p>
@@ -583,31 +580,31 @@ export default function MediaPlayerApp() {
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center gap-2 px-4 py-2 shrink-0">
-        <ControlBtn onClick={() => setShuffle((v) => !v)} title="Shuffle" active={shuffle}>
-          <ShuffleIcon />
-        </ControlBtn>
+      <Toolbar className="justify-center gap-2 bg-transparent border-b-0">
+        <ToolbarButton onClick={() => setShuffle((v) => !v)} title="Shuffle" active={shuffle}>
+          <Icon name="shuffle" />
+        </ToolbarButton>
 
-        <ControlBtn onClick={skipPrev} title="Previous (P)">
-          <SkipPrevIcon />
-        </ControlBtn>
+        <ToolbarButton onClick={skipPrev} title="Previous (P)">
+          <Icon name="skip-prev" />
+        </ToolbarButton>
 
         <button
           onClick={togglePlay}
           className="w-10 h-10 rounded-full bg-[hsl(var(--accent))] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
           title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
         >
-          {isPlaying ? <PauseIcon /> : <PlayIcon />}
+          {isPlaying ? <Icon name="pause" size={20} /> : <Icon name="play" size={20} />}
         </button>
 
-        <ControlBtn onClick={skipNext} title="Next (N)">
-          <SkipNextIcon />
-        </ControlBtn>
+        <ToolbarButton onClick={skipNext} title="Next (N)">
+          <Icon name="skip-next" />
+        </ToolbarButton>
 
-        <ControlBtn onClick={cycleRepeat} title={`Repeat: ${repeat}`} active={repeat !== 'none'}>
-          {repeat === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
-        </ControlBtn>
-      </div>
+        <ToolbarButton onClick={cycleRepeat} title={`Repeat: ${repeat}`} active={repeat !== 'none'}>
+          <Icon name={repeat === 'one' ? 'repeat-one' : 'repeat'} />
+        </ToolbarButton>
+      </Toolbar>
 
       {/* Bottom bar: volume + playlist toggle */}
       <div className="flex items-center gap-2 px-4 py-2 bg-[hsl(var(--surface-secondary))] border-t border-[hsl(var(--border))] shrink-0">
@@ -621,15 +618,15 @@ export default function MediaPlayerApp() {
 
         {/* Visualizer toggle (audio only) */}
         {!isVideo && (
-          <ControlBtn onClick={() => setVisualizerMode((v) => !v)} title="Visualizer" active={visualizerMode}>
-            <VisualizerIcon />
-          </ControlBtn>
+          <ToolbarButton onClick={() => setVisualizerMode((v) => !v)} title="Visualizer" active={visualizerMode}>
+            <Icon name="visualizer" />
+          </ToolbarButton>
         )}
 
         {/* Volume */}
         <div className="flex items-center gap-1.5">
           <button onClick={toggleMute} className="p-1 text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text))] transition-colors" title="Mute (M)">
-            {isMuted || volume === 0 ? <VolumeMuteIcon /> : volume < 0.5 ? <VolumeLowIcon /> : <VolumeIcon />}
+            {isMuted || volume === 0 ? <Icon name="volume-mute" /> : volume < 0.5 ? <Icon name="volume-low" /> : <Icon name="volume" />}
           </button>
           <input
             type="range"
@@ -643,9 +640,9 @@ export default function MediaPlayerApp() {
         </div>
 
         {/* Playlist toggle */}
-        <ControlBtn onClick={() => setShowPlaylist((v) => !v)} title="Playlist (L)" active={showPlaylist}>
-          <PlaylistIcon />
-        </ControlBtn>
+        <ToolbarButton onClick={() => setShowPlaylist((v) => !v)} title="Playlist (L)" active={showPlaylist}>
+          <Icon name="menu" />
+        </ToolbarButton>
       </div>
 
       {/* Playlist panel */}
@@ -698,7 +695,7 @@ export default function MediaPlayerApp() {
                         <span className="inline-block w-2 h-3 bg-[hsl(var(--accent))] rounded-sm animate-pulse" />
                       ) : (
                         <span className="text-xs text-[hsl(var(--text-secondary))]">
-                          {track.type === 'video' ? <VideoIconSmall /> : <MusicIconSmall />}
+                          <Icon name={track.type === 'video' ? 'video' : 'music'} size="xs" />
                         </span>
                       )}
                     </span>
@@ -720,172 +717,5 @@ export default function MediaPlayerApp() {
         </div>
       )}
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Control button
-// ---------------------------------------------------------------------------
-
-function ControlBtn({
-  children,
-  title,
-  onClick,
-  active,
-}: {
-  children: React.ReactNode;
-  title: string;
-  onClick: () => void;
-  active?: boolean;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={`p-1.5 rounded text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text))] transition-colors cursor-pointer ${
-        active ? 'text-[hsl(var(--accent))]' : ''
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Icons
-// ---------------------------------------------------------------------------
-
-function PlayIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <polygon points="5,2 18,10 5,18" />
-    </svg>
-  );
-}
-
-function PauseIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-      <rect x="4" y="2" width="4" height="16" rx="1" />
-      <rect x="12" y="2" width="4" height="16" rx="1" />
-    </svg>
-  );
-}
-
-function SkipPrevIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
-      <polygon points="12,3 3,9 12,15" />
-      <rect x="13" y="3" width="2" height="12" rx="0.5" />
-    </svg>
-  );
-}
-
-function SkipNextIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
-      <polygon points="6,3 15,9 6,15" />
-      <rect x="3" y="3" width="2" height="12" rx="0.5" />
-    </svg>
-  );
-}
-
-function ShuffleIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 5L5 5L8 11L11 11L14 11" />
-      <path d="M2 11L5 11L8 5L11 5L14 5" />
-      <path d="M12 3L14 5L12 7" />
-      <path d="M12 9L14 11L12 13" />
-    </svg>
-  );
-}
-
-function RepeatIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 6H12V12" />
-      <path d="M10 4L12 6L10 8" />
-    </svg>
-  );
-}
-
-function RepeatOneIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 6H12V12" />
-      <path d="M10 4L12 6L10 8" />
-      <text x="6" y="11" fontSize="6" fill="currentColor" stroke="none" textAnchor="middle" fontFamily="sans-serif">1</text>
-    </svg>
-  );
-}
-
-function VolumeIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M2 5.5H4L8 2.5V13.5L4 10.5H2V5.5Z" />
-      <path d="M10 5.5C11 6.5 11 9.5 10 10.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <path d="M12 3.5C14 5 14 11 12 12.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function VolumeLowIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M2 5.5H4L8 2.5V13.5L4 10.5H2V5.5Z" />
-      <path d="M10 5.5C11 6.5 11 9.5 10 10.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function VolumeMuteIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M2 5.5H4L8 2.5V13.5L4 10.5H2V5.5Z" />
-      <path d="M11 5.5L14 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M14 5.5L11 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PlaylistIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 4H13" />
-      <path d="M3 8H13" />
-      <path d="M3 12H9" />
-      <polygon points="12,10 14,12 12,14" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function VisualizerIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-      <rect x="1" y="8" width="2" height="6" rx="0.5" />
-      <rect x="4.5" y="5" width="2" height="9" rx="0.5" />
-      <rect x="8" y="3" width="2" height="11" rx="0.5" />
-      <rect x="11.5" y="6" width="2" height="8" rx="0.5" />
-    </svg>
-  );
-}
-
-function MusicIconSmall() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-      <circle cx="4" cy="9" r="2" />
-      <path d="M6 9V2L10 1V7" stroke="currentColor" strokeWidth="1" fill="none" />
-      <circle cx="10" cy="7" r="1.5" />
-    </svg>
-  );
-}
-
-function VideoIconSmall() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-      <rect x="1" y="2" width="7" height="8" rx="1" />
-      <polygon points="8.5,4 11,6 8.5,8" />
-    </svg>
   );
 }

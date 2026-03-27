@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Toolbar, SearchInput, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -203,14 +205,13 @@ export default function ClipboardApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))] text-sm">
       {/* Toolbar */}
-      <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-1.5">
+      <Toolbar>
         {/* Search */}
-        <input
-          type="text"
-          placeholder="Search..."
+        <SearchInput
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-36 rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1 text-xs text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))]"
+          onChange={setSearchQuery}
+          placeholder="Search..."
+          className="w-36"
         />
 
         {/* Filter tabs */}
@@ -244,30 +245,22 @@ export default function ClipboardApp() {
         >
           Clear
         </button>
-      </div>
+      </Toolbar>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-2">
         {filteredEntries.length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <div className="text-3xl mb-2">📋</div>
-              <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                {searchQuery
-                  ? 'No matches'
-                  : filter === 'pinned'
-                    ? 'No pinned items'
-                    : filter === 'recent'
-                      ? 'No recent items'
-                      : 'Clipboard is empty'}
-              </p>
-              {!searchQuery && filter === 'all' && (
-                <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">
-                  Copy text anywhere to see it here
-                </p>
-              )}
-            </div>
-          </div>
+          <EmptyState
+            icon={<Icon name="copy" size={24} className="text-[hsl(var(--muted-foreground))]" />}
+            title={searchQuery
+              ? 'No matches'
+              : filter === 'pinned'
+                ? 'No pinned items'
+                : filter === 'recent'
+                  ? 'No recent items'
+                  : 'Clipboard is empty'}
+            description={!searchQuery && filter === 'all' ? 'Copy text anywhere to see it here' : undefined}
+          />
         ) : (
           <div className="space-y-1">
             {filteredEntries.map((entry) => (
@@ -289,7 +282,7 @@ export default function ClipboardApp() {
           onClick={handlePasteNew}
           className="w-full cursor-pointer rounded-md border border-dashed border-[hsl(var(--border))] bg-transparent px-2.5 py-1 text-xs text-[hsl(var(--muted-foreground))] transition-colors duration-100 hover:border-[hsl(var(--accent)/0.5)] hover:text-[hsl(var(--accent))]"
         >
-          + Capture Current Clipboard
+          <Icon name="plus" size={12} className="mr-1" /> Capture Current Clipboard
         </button>
       </div>
     </div>
@@ -331,16 +324,13 @@ function ClipboardItem({
           className="mt-0.5 cursor-pointer shrink-0 transition-colors duration-100"
           title={entry.pinned ? 'Unpin' : 'Pin'}
         >
-          {entry.pinned ? (
-            <svg className="h-3.5 w-3.5 text-[hsl(var(--accent))]" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M9.828.722a.5.5 0 01.354 0l.707.707a.5.5 0 010 .707l-1.414 1.414a.5.5 0 01-.707 0L8 2.677 6.232 4.445a.5.5 0 01-.707 0l-.707-.707a.5.5 0 010-.707L5.636 1.828a2 2 0 012.828 0zM5.5 6v6.5a.5.5 0 01-.5.5H4a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5h1a.5.5 0 01.5.5zm5 0v6.5a.5.5 0 01-.5.5h-1a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5h1a.5.5 0 01.5.5z" />
-            </svg>
-          ) : (
-            <svg className="h-3.5 w-3.5 text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M9.828.722a.5.5 0 01.354 0l.707.707a.5.5 0 010 .707l-1.414 1.414a.5.5 0 01-.707 0L8 2.677 6.232 4.445a.5.5 0 01-.707 0l-.707-.707a.5.5 0 010-.707L5.636 1.828a2 2 0 012.828 0z" />
-              <path d="M5.5 6v6.5M10.5 6v6.5" />
-            </svg>
-          )}
+          <Icon
+            name="pin"
+            size={14}
+            className={entry.pinned
+              ? 'text-[hsl(var(--accent))]'
+              : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'}
+          />
         </button>
 
         {/* Content */}

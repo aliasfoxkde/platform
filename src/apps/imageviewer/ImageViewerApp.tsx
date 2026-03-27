@@ -4,6 +4,8 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { Toolbar, ToolbarButton, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -269,23 +271,22 @@ export default function ImageViewerApp() {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        <div className="w-20 h-20 rounded-2xl bg-[hsl(var(--surface-secondary))] flex items-center justify-center">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <path d="M21 15L16 10L5 21" />
-          </svg>
+        <EmptyState
+          icon={<Icon name="image" size={40} />}
+          title="Image Viewer"
+          description="Drop images here or click to open"
+          action={
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-4 py-2 bg-[hsl(var(--accent))] text-white rounded-lg text-sm hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              Open Files
+            </button>
+          }
+        />
+        <div className="text-xs text-[hsl(var(--text-secondary))]/60 mt-2">
+          Keyboard: Arrow keys navigate, +/- zoom, R rotate, G gallery
         </div>
-        <div className="text-center">
-          <p className="text-lg font-medium text-[hsl(var(--text))]">Image Viewer</p>
-          <p className="text-sm mt-1">Drop images here or click to open</p>
-        </div>
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="px-4 py-2 bg-[hsl(var(--accent))] text-white rounded-lg text-sm hover:opacity-90 transition-opacity"
-        >
-          Open Files
-        </button>
         <input
           ref={fileInputRef}
           type="file"
@@ -294,9 +295,6 @@ export default function ImageViewerApp() {
           className="hidden"
           onChange={(e) => e.target.files && loadFiles(e.target.files)}
         />
-        <div className="text-xs text-[hsl(var(--text-secondary))]/60 mt-2">
-          Keyboard: Arrow keys navigate, +/- zoom, R rotate, G gallery
-        </div>
       </div>
     );
   }
@@ -308,49 +306,49 @@ export default function ImageViewerApp() {
   return (
     <div className="flex flex-col h-full bg-[hsl(var(--surface))] text-[hsl(var(--text))]">
       {/* Toolbar */}
-      <div className="flex items-center gap-1 px-2 py-1.5 bg-[hsl(var(--surface-secondary))] border-b border-[hsl(var(--border))] shrink-0 flex-wrap">
-        <ToolBtn onClick={() => fileInputRef.current?.click()} title="Open files">
-          <FolderIcon />
-        </ToolBtn>
+      <Toolbar className="flex-wrap">
+        <ToolbarButton onClick={() => fileInputRef.current?.click()} title="Open files">
+          <Icon name="folder" />
+        </ToolbarButton>
 
         <div className="w-px h-5 bg-[hsl(var(--border))] mx-1" />
 
-        <ToolBtn onClick={() => setZoom((z) => Math.min(10, z + 0.25))} title="Zoom in (+)">
-          <ZoomInIcon />
-        </ToolBtn>
+        <ToolbarButton onClick={() => setZoom((z) => Math.min(10, z + 0.25))} title="Zoom in (+)">
+          <Icon name="zoom-in" />
+        </ToolbarButton>
         <span className="text-xs text-[hsl(var(--text-secondary))] w-12 text-center tabular-nums">
           {Math.round(zoom * 100)}%
         </span>
-        <ToolBtn onClick={() => setZoom((z) => Math.max(0.1, z - 0.25))} title="Zoom out (-)">
-          <ZoomOutIcon />
-        </ToolBtn>
-        <ToolBtn onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} title="Reset zoom (0)">
-          <ZoomFitIcon />
-        </ToolBtn>
+        <ToolbarButton onClick={() => setZoom((z) => Math.max(0.1, z - 0.25))} title="Zoom out (-)">
+          <Icon name="zoom-out" />
+        </ToolbarButton>
+        <ToolbarButton onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} title="Reset zoom (0)">
+          <Icon name="zoom-fit" />
+        </ToolbarButton>
 
         <div className="w-px h-5 bg-[hsl(var(--border))] mx-1" />
 
-        <ToolBtn onClick={() => rotate('cw')} title="Rotate clockwise (R)">
-          <RotateCWIcon />
-        </ToolBtn>
-        <ToolBtn onClick={() => rotate('ccw')} title="Rotate counter-clockwise">
-          <RotateCCWIcon />
-        </ToolBtn>
-        <ToolBtn onClick={flipH} title="Flip horizontal">
-          <FlipHIcon />
-        </ToolBtn>
-        <ToolBtn onClick={flipV} title="Flip vertical">
-          <FlipVIcon />
-        </ToolBtn>
+        <ToolbarButton onClick={() => rotate('cw')} title="Rotate clockwise (R)">
+          <Icon name="rotate-cw" />
+        </ToolbarButton>
+        <ToolbarButton onClick={() => rotate('ccw')} title="Rotate counter-clockwise">
+          <Icon name="rotate-ccw" />
+        </ToolbarButton>
+        <ToolbarButton onClick={flipH} title="Flip horizontal">
+          <Icon name="flip-h" />
+        </ToolbarButton>
+        <ToolbarButton onClick={flipV} title="Flip vertical">
+          <Icon name="flip-v" />
+        </ToolbarButton>
 
         <div className="w-px h-5 bg-[hsl(var(--border))] mx-1" />
 
-        <ToolBtn onClick={resetTransforms} title="Reset all transforms">
-          <ResetIcon />
-        </ToolBtn>
-        <ToolBtn onClick={removeImage} title="Delete image (Delete)">
-          <TrashIcon />
-        </ToolBtn>
+        <ToolbarButton onClick={resetTransforms} title="Reset all transforms">
+          <Icon name="refresh" />
+        </ToolbarButton>
+        <ToolbarButton onClick={removeImage} title="Delete image (Delete)">
+          <Icon name="trash" />
+        </ToolbarButton>
 
         <div className="flex-1" />
 
@@ -359,7 +357,7 @@ export default function ImageViewerApp() {
             <button
               key={mode}
               onClick={() => setFitMode(mode)}
-              className={`px-2 py-0.5 rounded transition-colors ${
+              className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${
                 fitMode === mode
                   ? 'bg-[hsl(var(--accent))] text-white'
                   : 'text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text))]'
@@ -370,10 +368,10 @@ export default function ImageViewerApp() {
           ))}
         </div>
 
-        <ToolBtn onClick={() => setShowGallery((v) => !v)} title="Gallery (G)" active={showGallery}>
-          <GalleryIcon />
-        </ToolBtn>
-      </div>
+        <ToolbarButton onClick={() => setShowGallery((v) => !v)} title="Gallery (G)" active={showGallery}>
+          <Icon name="gallery" />
+        </ToolbarButton>
+      </Toolbar>
 
       {/* Main content */}
       <div className="flex-1 relative overflow-hidden">
@@ -457,13 +455,13 @@ export default function ImageViewerApp() {
               onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors z-10 backdrop-blur-sm"
             >
-              <ChevronLeftIcon />
+              <Icon name="chevron-left" />
             </button>
             <button
               onClick={() => setActiveIndex((i) => Math.min(images.length - 1, i + 1))}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors z-10 backdrop-blur-sm"
             >
-              <ChevronRightIcon />
+              <Icon name="chevron-right" />
             </button>
           </>
         )}
@@ -477,162 +475,4 @@ export default function ImageViewerApp() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Toolbar button
-// ---------------------------------------------------------------------------
 
-function ToolBtn({
-  children,
-  title,
-  onClick,
-  active,
-}: {
-  children: React.ReactNode;
-  title: string;
-  onClick: () => void;
-  active?: boolean;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={`p-1.5 rounded hover:bg-[hsl(var(--surface-secondary))] text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text))] transition-colors cursor-pointer ${
-        active ? 'text-[hsl(var(--accent))] bg-[hsl(var(--accent))]/10' : ''
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Icons
-// ---------------------------------------------------------------------------
-
-function FolderIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1.5 3.5H6.5L8 5H14.5V12.5H1.5V3.5Z" />
-    </svg>
-  );
-}
-
-function ZoomInIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="7" cy="7" r="4.5" />
-      <path d="M10.5 10.5L14 14" />
-      <path d="M5 7H9" />
-      <path d="M7 5V9" />
-    </svg>
-  );
-}
-
-function ZoomOutIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="7" cy="7" r="4.5" />
-      <path d="M10.5 10.5L14 14" />
-      <path d="M5 7H9" />
-    </svg>
-  );
-}
-
-function ZoomFitIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 6V2H6" />
-      <path d="M10 2H14V6" />
-      <path d="M14 10V14H10" />
-      <path d="M6 14H2V10" />
-      <rect x="5" y="5" width="6" height="6" rx="1" />
-    </svg>
-  );
-}
-
-function RotateCWIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M13.5 8A5.5 5.5 0 1 1 8 2.5" />
-      <path d="M10 2.5H13.5V6" />
-    </svg>
-  );
-}
-
-function RotateCCWIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2.5 8A5.5 5.5 0 1 1 8 13.5" />
-      <path d="M6 13.5H2.5V10" />
-    </svg>
-  );
-}
-
-function FlipHIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M8 2V14" strokeDasharray="2 2" />
-      <path d="M4 5L2 8L4 11" />
-      <path d="M12 5L14 8L12 11" />
-    </svg>
-  );
-}
-
-function FlipVIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 8H14" strokeDasharray="2 2" />
-      <path d="M5 4L8 2L11 4" />
-      <path d="M5 12L8 14L11 12" />
-    </svg>
-  );
-}
-
-function ResetIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="8" cy="8" r="6.5" />
-      <path d="M4 8H12" />
-      <path d="M8 4V12" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 4H13" />
-      <path d="M5 4V2.5H11V4" />
-      <path d="M4 4L4.5 13H11.5L12 4" />
-      <path d="M6.5 6.5V11" />
-      <path d="M9.5 6.5V11" />
-    </svg>
-  );
-}
-
-function GalleryIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="1" y="1" width="6" height="6" rx="1" />
-      <rect x="9" y="1" width="6" height="6" rx="1" />
-      <rect x="1" y="9" width="6" height="6" rx="1" />
-      <rect x="9" y="9" width="6" height="6" rx="1" />
-    </svg>
-  );
-}
-
-function ChevronLeftIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 12L6 8L10 4" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 4L10 8L6 12" />
-    </svg>
-  );
-}

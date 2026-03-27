@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { TabBar, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -244,9 +246,7 @@ export default function GitApp() {
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))] text-sm">
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-1.5">
-        <svg className="h-3.5 w-3.5 text-[hsl(var(--accent))]" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M11.93 8.5a4.002 4.002 0 01-7.86 0H1.5a.5.5 0 010-1h2.57a4.002 4.002 0 017.86 0h2.57a.5.5 0 010 1h-2.57zM8 11a3 3 0 100-6 3 3 0 000 6z" />
-        </svg>
+        <Icon name="git-branch" size="sm" className="text-[hsl(var(--accent))]" />
         <span className="text-xs font-semibold text-[hsl(var(--foreground))]">Git</span>
 
         <div className="mx-1 h-4 w-px bg-[hsl(var(--border))]" />
@@ -263,26 +263,15 @@ export default function GitApp() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))]">
-        {(['changes', 'history', 'branches'] as TabView[]).map((v) => (
-          <button
-            key={v}
-            onClick={() => { setView(v); setDiffFile(null); }}
-            className={`cursor-pointer px-3 py-1.5 text-xs capitalize ${
-              view === v
-                ? 'border-b-2 border-b-[hsl(var(--accent))] text-[hsl(var(--foreground))]'
-                : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'
-            }`}
-          >
-            {v}
-            {v === 'changes' && stagedCount > 0 && (
-              <span className="ml-1 rounded-full bg-[hsl(var(--accent))] px-1.5 py-px text-[9px] text-[hsl(var(--accent-foreground))]">
-                {stagedCount}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+      <TabBar
+        tabs={[
+          { id: 'changes', label: `changes${stagedCount > 0 ? ` (${stagedCount})` : ''}` },
+          { id: 'history', label: 'history' },
+          { id: 'branches', label: 'branches' },
+        ]}
+        activeTabId={view}
+        onTabChange={(id) => { setView(id as TabView); setDiffFile(null); }}
+      />
 
       {/* Content */}
       <div className="flex flex-1 overflow-hidden">
@@ -422,9 +411,7 @@ function ChangesView({
         )}
 
         {fileStatuses.length === 0 && (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-xs text-[hsl(var(--muted-foreground))]">No changes</p>
-          </div>
+          <EmptyState icon={<Icon name="check" />} title="No changes" />
         )}
       </div>
     </div>
@@ -492,9 +479,7 @@ function HistoryView({
   return (
     <div className="flex-1 overflow-y-auto">
       {commits.length === 0 ? (
-        <div className="flex h-full items-center justify-center">
-          <p className="text-xs text-[hsl(var(--muted-foreground))]">No commits</p>
-        </div>
+        <EmptyState icon={<Icon name="commit" />} title="No commits" />
       ) : (
         commits.map((commit) => (
           <div key={commit.id} className="border-b border-[hsl(var(--border))]/50">
@@ -502,13 +487,11 @@ function HistoryView({
               className="flex cursor-pointer items-center gap-2 px-2 py-1.5 hover:bg-[hsl(var(--surface))]"
               onClick={() => onToggle(expandedCommit === commit.id ? null : commit.id)}
             >
-              <svg
-                className={`h-3 w-3 shrink-0 text-[hsl(var(--muted-foreground))] transition-transform duration-100 ${expandedCommit === commit.id ? 'rotate-90' : ''}`}
-                viewBox="0 0 16 16"
-                fill="currentColor"
-              >
-                <path d="M6 3l5 5-5 5V3z" />
-              </svg>
+              <Icon
+                name="chevron-right"
+                size={12}
+                className={`shrink-0 text-[hsl(var(--muted-foreground))] transition-transform duration-100 ${expandedCommit === commit.id ? 'rotate-90' : ''}`}
+              />
               <div className="flex-1 min-w-0">
                 <div className="truncate text-xs font-medium text-[hsl(var(--foreground))]">
                   {commit.message}

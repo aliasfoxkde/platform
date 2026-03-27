@@ -10,6 +10,8 @@ import {
   deletePath,
   exists,
 } from '@/storage';
+import { Toolbar, ToolbarButton, SearchInput, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -206,12 +208,10 @@ export default function NotesApp() {
         <aside className="flex w-56 shrink-0 flex-col border-r border-[hsl(var(--border))] bg-[hsl(var(--surface))]">
           {/* Search */}
           <div className="p-2 border-b border-[hsl(var(--border))]">
-            <input
-              type="text"
+            <SearchInput
               placeholder="Search notes..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2.5 py-1.5 text-xs text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))]"
+              onChange={setSearchQuery}
             />
           </div>
 
@@ -257,96 +257,86 @@ export default function NotesApp() {
           {activeNote ? (
             <>
               {/* Toolbar */}
-              <div className="flex items-center gap-1 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-2 py-1.5">
+              <Toolbar>
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleBold().run()}
-                  isActive={editor?.isActive('bold')}
+                  active={editor?.isActive('bold')}
                   title="Bold"
                 >
-                  <span className="font-bold">B</span>
+                  <Icon name="bold" size="sm" />
                 </ToolbarButton>
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleItalic().run()}
-                  isActive={editor?.isActive('italic')}
+                  active={editor?.isActive('italic')}
                   title="Italic"
                 >
-                  <span className="italic">I</span>
+                  <Icon name="italic" size="sm" />
                 </ToolbarButton>
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleStrike().run()}
-                  isActive={editor?.isActive('strike')}
+                  active={editor?.isActive('strike')}
                   title="Strikethrough"
                 >
-                  <span className="line-through">S</span>
+                  <Icon name="strikethrough" size="sm" />
                 </ToolbarButton>
 
                 <div className="mx-1 h-4 w-px bg-[hsl(var(--border))]" />
 
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-                  isActive={editor?.isActive('heading', { level: 1 })}
+                  active={editor?.isActive('heading', { level: 1 })}
                   title="Heading 1"
                 >
-                  <span className="text-xs font-bold">H1</span>
+                  <Icon name="heading-1" size="sm" />
                 </ToolbarButton>
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-                  isActive={editor?.isActive('heading', { level: 2 })}
+                  active={editor?.isActive('heading', { level: 2 })}
                   title="Heading 2"
                 >
-                  <span className="text-xs font-bold">H2</span>
+                  <Icon name="heading-2" size="sm" />
                 </ToolbarButton>
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
-                  isActive={editor?.isActive('heading', { level: 3 })}
+                  active={editor?.isActive('heading', { level: 3 })}
                   title="Heading 3"
                 >
-                  <span className="text-xs font-bold">H3</span>
+                  <Icon name="heading-3" size="sm" />
                 </ToolbarButton>
 
                 <div className="mx-1 h-4 w-px bg-[hsl(var(--border))]" />
 
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleBulletList().run()}
-                  isActive={editor?.isActive('bulletList')}
+                  active={editor?.isActive('bulletList')}
                   title="Bullet List"
                 >
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M2 4h12v1H2V4zm0 4h12v1H2V8zm0 4h12v1H2v-1z" />
-                  </svg>
+                  <Icon name="list" size="sm" />
                 </ToolbarButton>
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-                  isActive={editor?.isActive('orderedList')}
+                  active={editor?.isActive('orderedList')}
                   title="Ordered List"
                 >
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M5 2v12H4V2h1zm5 0a3 3 0 013 3v6a3 3 0 01-3 3H8v-1h2a2 2 0 002-2V5a2 2 0 00-2-2H8V2h2z" />
-                  </svg>
+                  <Icon name="ordered-list" size="sm" />
                 </ToolbarButton>
                 <ToolbarButton
                   onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
-                  isActive={editor?.isActive('codeBlock')}
+                  active={editor?.isActive('codeBlock')}
                   title="Code Block"
                 >
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M4 1.5L1 5l3 3.5L1 12l1.5.5L6 8.5 3.5 5 6 1.5H4zm7 0L15 5l-3 3.5L15 12l-1.5.5L10 8.5 12.5 5 10 1.5h1z" />
-                  </svg>
+                  <Icon name="code" size="sm" />
                 </ToolbarButton>
 
                 <div className="flex-1" />
 
-                <button
+                <ToolbarButton
                   onClick={handleDeleteNote}
-                  className="cursor-pointer rounded-md px-2 py-1 text-xs text-[hsl(var(--muted-foreground))] transition-colors duration-100 hover:bg-[hsl(var(--destructive)/0.1)] hover:text-[hsl(var(--destructive))]"
                   title="Delete note"
                 >
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z" />
-                    <path fillRule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H5.5l1-1h3l1 1h2.5a1 1 0 011 1v1z" />
-                  </svg>
-                </button>
-              </div>
+                  <Icon name="trash" size="sm" />
+                </ToolbarButton>
+              </Toolbar>
 
               {/* Editor content */}
               <div className="flex-1 overflow-y-auto">
@@ -354,12 +344,11 @@ export default function NotesApp() {
               </div>
             </>
           ) : (
-            <div className="flex flex-1 items-center justify-center text-[hsl(var(--muted-foreground))]">
-              <div className="text-center">
-                <div className="text-3xl mb-2">📝</div>
-                <p className="text-sm">Select a note or create a new one</p>
-              </div>
-            </div>
+            <EmptyState
+              icon={<Icon name="file-text" size="lg" />}
+              title="Select a note or create a new one"
+              className="flex-1"
+            />
           )}
         </main>
       </div>
@@ -367,32 +356,3 @@ export default function NotesApp() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Toolbar button
-// ---------------------------------------------------------------------------
-
-function ToolbarButton({
-  onClick,
-  isActive,
-  title,
-  children,
-}: {
-  onClick: () => void;
-  isActive?: boolean;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={`cursor-pointer rounded px-1.5 py-1 text-xs transition-colors duration-100 ${
-        isActive
-          ? 'bg-[hsl(var(--accent)/0.2)] text-[hsl(var(--accent))]'
-          : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}

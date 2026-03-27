@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
+import { Toolbar, ToolbarButton, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // Set worker source
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -142,34 +144,34 @@ export default function PDFViewerApp() {
     >
       {/* Toolbar */}
       {state.numPages > 0 && (
-        <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-1.5">
-          <button onClick={() => goToPage(state.currentPage - 1)} disabled={state.currentPage <= 1} className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--foreground))] disabled:opacity-40 disabled:cursor-not-allowed">
-            ←
-          </button>
+        <Toolbar>
+          <ToolbarButton onClick={() => goToPage(state.currentPage - 1)} disabled={state.currentPage <= 1} title="Previous page">
+            <Icon name="chevron-left" size={14} />
+          </ToolbarButton>
           <span className="text-xs text-[hsl(var(--muted-foreground))]">
             {state.currentPage} / {state.numPages}
           </span>
-          <button onClick={() => goToPage(state.currentPage + 1)} disabled={state.currentPage >= state.numPages} className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--foreground))] disabled:opacity-40 disabled:cursor-not-allowed">
-            →
-          </button>
+          <ToolbarButton onClick={() => goToPage(state.currentPage + 1)} disabled={state.currentPage >= state.numPages} title="Next page">
+            <Icon name="chevron-right" size={14} />
+          </ToolbarButton>
 
           <div className="mx-1 h-4 w-px bg-[hsl(var(--border))]" />
 
-          <button onClick={zoomOut} className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--foreground))]">
-            −
-          </button>
+          <ToolbarButton onClick={zoomOut} title="Zoom out">
+            <Icon name="zoom-out" size={14} />
+          </ToolbarButton>
           <span className="text-xs text-[hsl(var(--muted-foreground))]">
             {Math.round(state.scale * 100)}%
           </span>
-          <button onClick={zoomIn} className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--foreground))]">
-            +
-          </button>
+          <ToolbarButton onClick={zoomIn} title="Zoom in">
+            <Icon name="zoom-in" size={14} />
+          </ToolbarButton>
 
           <div className="mx-1 h-4 w-px bg-[hsl(var(--border))]" />
 
-          <button onClick={rotate} className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--foreground))]" title="Rotate">
-            ↻
-          </button>
+          <ToolbarButton onClick={rotate} title="Rotate">
+            <Icon name="rotate-cw" size={14} />
+          </ToolbarButton>
 
           <div className="flex-1" />
 
@@ -185,7 +187,7 @@ export default function PDFViewerApp() {
           >
             Open
           </button>
-        </div>
+        </Toolbar>
       )}
 
       {/* Content */}
@@ -199,16 +201,16 @@ export default function PDFViewerApp() {
           <canvas ref={canvasRef} className="shadow-lg" />
         ) : (
           <div
-            className="flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[hsl(var(--border))] bg-[hsl(var(--surface)/0.3)] p-8 transition-colors hover:border-[hsl(var(--accent)/0.5)]"
+            className="flex h-full w-full cursor-pointer items-center justify-center"
             onClick={() => fileInputRef.current?.click()}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
           >
-            <div className="text-4xl mb-3">📄</div>
-            <p className="text-sm font-medium text-[hsl(var(--foreground))]">Open a PDF file</p>
-            <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
-              Drag and drop or click to browse
-            </p>
+            <EmptyState
+              icon={<Icon name="file-text" size={28} className="text-[hsl(var(--muted-foreground))]" />}
+              title="Open a PDF file"
+              description="Drag and drop or click to browse"
+            />
           </div>
         )}
       </div>

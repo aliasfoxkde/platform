@@ -12,6 +12,8 @@ import {
   executeToolCall,
 } from '@/capabilities/ai/toolSchema';
 import type { ToolDefinition } from '@/capabilities/ai/toolSchema';
+import { Toolbar, ToolbarButton, EmptyState, TabBar } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -343,34 +345,31 @@ export default function AIAssistantApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))] text-sm">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-1.5">
-        <svg className="h-4 w-4 text-[hsl(var(--accent))]" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12v-.008zM12 15.75h.008v.008H12v-.008z" />
-        </svg>
+      <Toolbar className="px-3 py-1.5">
+        <Icon name="info" size="sm" className="text-[hsl(var(--accent))]" />
         <span className="text-xs font-semibold text-[hsl(var(--foreground))]">AI Assistant</span>
         <span className="text-[9px] text-[hsl(var(--muted-foreground))]">{contextInfo}</span>
 
         <div className="flex-1" />
 
-        <button
+        <ToolbarButton
           onClick={() => setActiveTab('tools')}
-          className={`cursor-pointer rounded px-2 py-0.5 text-[9px] ${activeTab === 'tools' ? 'bg-[hsl(var(--accent)/0.15)] text-[hsl(var(--accent))]' : 'text-[hsl(var(--muted-foreground))]'}`}
+          active={activeTab === 'tools'}
+          title="Tools"
         >
-          Tools ({toolDefs.length})
-        </button>
-        <button
+          <span className="text-[9px]">Tools ({toolDefs.length})</span>
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => setActiveTab('settings')}
-          className={`cursor-pointer rounded px-2 py-0.5 text-[9px] ${activeTab === 'settings' ? 'bg-[hsl(var(--accent)/0.15)] text-[hsl(var(--accent))]' : 'text-[hsl(var(--muted-foreground))]'}`}
+          active={activeTab === 'settings'}
+          title="Settings"
         >
-          Settings
-        </button>
-        <button
-          onClick={handleClear}
-          className="cursor-pointer rounded px-2 py-0.5 text-[9px] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--destructive))]"
-        >
-          Clear
-        </button>
-      </div>
+          <Icon name="settings" size="sm" />
+        </ToolbarButton>
+        <ToolbarButton onClick={handleClear} title="Clear chat">
+          <Icon name="trash" size="sm" />
+        </ToolbarButton>
+      </Toolbar>
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
@@ -380,19 +379,11 @@ export default function AIAssistantApp() {
             <div className="flex-1 overflow-y-auto px-4 py-3">
               {messages.length === 0 && (
                 <div className="flex h-full items-center justify-center">
-                  <div className="text-center max-w-xs">
-                    <div className="text-3xl mb-3 opacity-30">
-                      <svg className="h-10 w-10 mx-auto text-[hsl(var(--muted-foreground))]" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                      AI assistant with tool use. Configure your API provider in Settings to get started.
-                    </p>
-                    <p className="mt-2 text-[10px] text-[hsl(var(--muted-foreground))] opacity-60">
-                      You can ask me to read files, manage windows, run commands, and more.
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={<Icon name="info" size="lg" />}
+                    title="AI Assistant"
+                    description="AI assistant with tool use. Configure your API provider in Settings to get started."
+                  />
                 </div>
               )}
 
@@ -427,9 +418,7 @@ export default function AIAssistantApp() {
                       >
                         {isTool && msg.toolCall && (
                           <div className="mb-1 flex items-center gap-1 text-[9px]">
-                            <svg className="h-3 w-3" viewBox="0 0 16 16" fill="currentColor">
-                              <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                            <Icon name="info" size={12} className="text-[hsl(var(--accent))]" />
                             <span className="font-mono text-[hsl(var(--accent))]">{msg.toolCall.name}</span>
                           </div>
                         )}
@@ -492,9 +481,7 @@ export default function AIAssistantApp() {
                   disabled={!input.trim() || loading}
                   className="cursor-pointer rounded-md bg-[hsl(var(--accent))] p-2 text-[hsl(var(--accent-foreground))] hover:opacity-90 disabled:opacity-40"
                 >
-                  <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M15.854.146a.5.5 0 01-.523.77l-3.983 2.443a.75.75 0 01-.836-.035l-2.792-2.084a.5.5 0 01.6-.8l2.492 1.86 3.596-2.21a.5.5 0 01.846.46z" />
-                  </svg>
+                  <Icon name="send" size="sm" />
                 </button>
               </div>
             </div>
@@ -580,8 +567,9 @@ function SettingsView({
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] px-3 py-1.5">
-        <button onClick={onBack} className="cursor-pointer text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
-          ← Back
+        <button onClick={onBack} className="cursor-pointer text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] flex items-center gap-1">
+          <Icon name="chevron-left" size="sm" />
+          <span className="text-xs">Back</span>
         </button>
         <span className="text-xs font-semibold text-[hsl(var(--foreground))]">AI Provider Settings</span>
       </div>

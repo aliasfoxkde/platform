@@ -3,6 +3,8 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { Toolbar, ToolbarButton, Panel } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -276,24 +278,20 @@ export default function BrowserApp() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-1 px-2 py-1.5 bg-[hsl(var(--surface-secondary))] border-b border-[hsl(var(--border))] shrink-0">
+      <Toolbar>
         {/* Navigation buttons */}
-        <button onClick={goBack} className="toolbar-btn" title="Back" disabled={!activeTab.canGoBack}>
-          <ChevronLeftIcon />
-        </button>
-        <button onClick={goForward} className="toolbar-btn" title="Forward" disabled={!activeTab.canGoForward}>
-          <ChevronRightIcon />
-        </button>
-        <button
-          onClick={refresh}
-          className="toolbar-btn"
-          title="Refresh"
-        >
-          <RefreshIcon />
-        </button>
-        <button onClick={goHome} className="toolbar-btn" title="Home">
-          <HomeIcon />
-        </button>
+        <ToolbarButton onClick={goBack} title="Back" disabled={!activeTab.canGoBack}>
+          <Icon name="chevron-left" />
+        </ToolbarButton>
+        <ToolbarButton onClick={goForward} title="Forward" disabled={!activeTab.canGoForward}>
+          <Icon name="chevron-right" />
+        </ToolbarButton>
+        <ToolbarButton onClick={refresh} title="Refresh">
+          <Icon name="refresh" />
+        </ToolbarButton>
+        <ToolbarButton onClick={goHome} title="Home">
+          <Icon name="home" />
+        </ToolbarButton>
 
         {/* URL bar */}
         <form onSubmit={handleUrlSubmit} className="flex-1 mx-1">
@@ -307,28 +305,28 @@ export default function BrowserApp() {
         </form>
 
         {/* Bookmark button */}
-        <button onClick={toggleBookmark} className="toolbar-btn" title={isBookmarked ? 'Remove bookmark' : 'Bookmark this page'}>
-          {isBookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
-        </button>
+        <ToolbarButton onClick={toggleBookmark} title={isBookmarked ? 'Remove bookmark' : 'Bookmark this page'}>
+          {isBookmarked ? <Icon name="bookmark-filled" /> : <Icon name="bookmark" />}
+        </ToolbarButton>
 
         {/* Bookmarks panel toggle */}
-        <button
+        <ToolbarButton
           onClick={() => { setShowBookmarks(!showBookmarks); setShowHistory(false); }}
-          className={`toolbar-btn ${showBookmarks ? 'text-[hsl(var(--accent))]' : ''}`}
+          active={showBookmarks}
           title="Bookmarks"
         >
-          <BookmarkListIcon />
-        </button>
+          <Icon name="bookmark" />
+        </ToolbarButton>
 
         {/* History panel toggle */}
-        <button
+        <ToolbarButton
           onClick={() => { setShowHistory(!showHistory); setShowBookmarks(false); }}
-          className={`toolbar-btn ${showHistory ? 'text-[hsl(var(--accent))]' : ''}`}
+          active={showHistory}
           title="History"
         >
-          <HistoryIcon />
-        </button>
-      </div>
+          <Icon name="history" />
+        </ToolbarButton>
+      </Toolbar>
 
       {/* Content area */}
       <div className="flex-1 relative overflow-hidden">
@@ -418,133 +416,3 @@ export default function BrowserApp() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Side Panel
-// ---------------------------------------------------------------------------
-
-function Panel({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="absolute top-0 right-0 bottom-0 w-72 bg-[hsl(var(--surface))] border-l border-[hsl(var(--border))] z-20 flex flex-col shadow-lg">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[hsl(var(--border))]">
-        <span className="text-sm font-medium">{title}</span>
-        <button onClick={onClose} className="text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text))] text-lg">
-          x
-        </button>
-      </div>
-      <div className="flex-1 overflow-y-auto relative">{children}</div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Icons (inline SVG)
-// ---------------------------------------------------------------------------
-
-function toolbarBtnClass(disabled = false) {
-  return `p-1.5 rounded hover:bg-[hsl(var(--surface-secondary))] text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text))] transition-colors ${
-    disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
-  }`;
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function ToolbarButton({
-  children,
-  title,
-  disabled,
-  onClick,
-  active,
-}: {
-  children: React.ReactNode;
-  title: string;
-  disabled?: boolean;
-  onClick: () => void;
-  active?: boolean;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      disabled={disabled}
-      className={`${toolbarBtnClass(disabled)} ${active ? 'text-[hsl(var(--accent))]' : ''}`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function ChevronLeftIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 12L6 8L10 4" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 4L10 8L6 12" />
-    </svg>
-  );
-}
-
-function RefreshIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M13.5 8A5.5 5.5 0 1 1 8 2.5" />
-      <path d="M13.5 2.5V8H8" />
-    </svg>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 8L8 2L14 8" />
-      <path d="M3 7V13.5H6.5V9.5H9.5V13.5H13V7" />
-    </svg>
-  );
-}
-
-function BookmarkIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 2H13V14L8 11L3 14V2Z" />
-    </svg>
-  );
-}
-
-function BookmarkFilledIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" stroke="currentColor" strokeWidth="1">
-      <path d="M3 2H13V14L8 11L3 14V2Z" />
-    </svg>
-  );
-}
-
-function BookmarkListIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 2H13V14L8 11L3 14V2Z" />
-      <path d="M5 5H8" />
-      <path d="M5 7.5H8" />
-    </svg>
-  );
-}
-
-function HistoryIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="8" cy="8" r="6" />
-      <path d="M8 5V8L10.5 9.5" />
-    </svg>
-  );
-}

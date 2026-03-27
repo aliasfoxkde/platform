@@ -5,6 +5,8 @@ import {
   writeFile,
   createDirectory,
 } from '@/storage';
+import { ToolbarButton, EmptyState, SearchInput } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -326,12 +328,11 @@ export default function ChatApp() {
         <aside className="flex w-60 shrink-0 flex-col border-r border-[hsl(var(--border))] bg-[hsl(var(--surface))]">
           {/* Search */}
           <div className="p-2 border-b border-[hsl(var(--border))]">
-            <input
-              type="text"
-              placeholder="Search conversations..."
+            <SearchInput
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1.5 text-xs text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))]"
+              onChange={setSearchQuery}
+              placeholder="Search conversations..."
+              className="text-xs"
             />
           </div>
 
@@ -388,14 +389,9 @@ export default function ChatApp() {
       <div className="flex flex-1 flex-col">
         {/* Chat header */}
         <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-1.5">
-          <button
-            onClick={() => setShowSidebar(!showSidebar)}
-            className="cursor-pointer rounded p-0.5 text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
-          >
-            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M2 3h12v1H2V3zm0 3h12v1H2V6zm0 3h12v1H2V9zm0 3h12v1H2v-1z" />
-            </svg>
-          </button>
+          <ToolbarButton onClick={() => setShowSidebar(!showSidebar)} title="Toggle sidebar">
+            <Icon name="menu" size="sm" />
+          </ToolbarButton>
           <span className="text-xs font-semibold text-[hsl(var(--foreground))]">
             {activeConversationId
               ? conversations.find((c) => c.id === activeConversationId)?.name
@@ -407,10 +403,7 @@ export default function ChatApp() {
               className="ml-auto cursor-pointer rounded p-0.5 text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--destructive))]"
               title="Delete conversation"
             >
-              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z" />
-                <path fillRule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H5.5l1-1h3l1 1h2.5a1 1 0 011 1v1z" />
-              </svg>
+              <Icon name="trash" size="xs" />
             </button>
           )}
         </div>
@@ -418,14 +411,11 @@ export default function ChatApp() {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-3">
           {!activeConversationId && (
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-3 opacity-30">💬</div>
-                <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                  Start a new conversation or select one
-                </p>
-              </div>
-            </div>
+            <EmptyState
+              icon={<span className="text-4xl opacity-30">💬</span>}
+              title="No conversation selected"
+              description="Start a new conversation or select one"
+            />
           )}
 
           {messages.map((msg, idx) => {
@@ -515,9 +505,7 @@ export default function ChatApp() {
               disabled={!input.trim() || !activeConversationId}
               className="cursor-pointer rounded-md bg-[hsl(var(--accent))] p-1.5 text-[hsl(var(--accent-foreground))] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M15.854.146a.5.5 0 01-.523.77l-3.983 2.443a.75.75 0 01-.836-.035l-2.792-2.084a.5.5 0 01.6-.8l2.492 1.86 3.596-2.21a.5.5 0 01.846.46z" />
-              </svg>
+              <Icon name="send" size="sm" />
             </button>
           </div>
         </div>

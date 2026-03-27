@@ -1,4 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { TabBar } from "@/ui/components";
+import { Icon } from "@/ui/icons";
 
 interface EditorTab {
   id: string;
@@ -91,28 +93,21 @@ export default function EditorApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))]">
       {/* Tab bar */}
-      <div className="flex shrink-0 items-center border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))]">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTabId(tab.id)}
-            className={`cursor-pointer border-r border-[hsl(var(--border))] px-3 py-1.5 text-xs transition-colors duration-[var(--transition)] ${
-              tab.id === activeTabId
-                ? "bg-[hsl(var(--background))] text-[hsl(var(--foreground))]"
-                : "text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-bright))] hover:text-[hsl(var(--foreground))]"
-            }`}
-          >
-            {tab.name}
-            {tab.modified && (
-              <span className="ml-1 text-[hsl(var(--accent))]">*</span>
-            )}
-          </button>
-        ))}
+      <div className="flex shrink-0 items-center">
+        <TabBar
+          tabs={tabs.map((tab) => ({
+            id: tab.id,
+            label: tab.name,
+            modified: tab.modified,
+          }))}
+          activeTabId={activeTabId}
+          onTabChange={setActiveTabId}
+        />
         <button
           title="New tab"
           className="cursor-pointer px-2 py-1.5 text-xs text-[hsl(var(--muted-foreground))] transition-colors duration-[var(--transition)] hover:bg-[hsl(var(--surface-bright))] hover:text-[hsl(var(--foreground))]"
         >
-          +
+          <Icon name="plus" size={12} />
         </button>
       </div>
 

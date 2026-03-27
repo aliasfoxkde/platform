@@ -5,6 +5,8 @@ import {
   writeFile,
   createDirectory,
 } from '@/storage';
+import { Toolbar, ToolbarButton, TabBar, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -348,11 +350,8 @@ export default function AutomationApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))] text-sm">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-1.5">
-        <svg className="h-3.5 w-3.5 text-[hsl(var(--accent))]" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 3a5 5 0 100 10A5 5 0 008 3zm0 1a4 4 0 100 8 4 4 0 000-8z" />
-          <path d="M6.5 5.5a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0z" />
-        </svg>
+      <Toolbar className="px-3 py-1.5">
+        <Icon name="settings" size="sm" className="text-[hsl(var(--accent))]" />
         <span className="text-xs font-semibold text-[hsl(var(--foreground))]">Automations</span>
 
         <div className="flex-1" />
@@ -360,23 +359,17 @@ export default function AutomationApp() {
         <span className="text-[9px] text-[hsl(var(--muted-foreground))]">
           {automations.filter((a) => a.enabled).length} active
         </span>
-      </div>
+      </Toolbar>
 
       {/* Tabs */}
-      <div className="flex border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))]">
-        <button
-          onClick={() => setActiveTab('automations')}
-          className={`cursor-pointer px-3 py-1 text-xs ${activeTab === 'automations' ? 'border-b-2 border-b-[hsl(var(--accent))] text-[hsl(var(--foreground))]' : 'text-[hsl(var(--muted-foreground))]'}`}
-        >
-          Automations ({automations.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('log')}
-          className={`cursor-pointer px-3 py-1 text-xs ${activeTab === 'log' ? 'border-b-2 border-b-[hsl(var(--accent))] text-[hsl(var(--foreground))]' : 'text-[hsl(var(--muted-foreground))]'}`}
-        >
-          Log ({log.length})
-        </button>
-      </div>
+      <TabBar
+        tabs={[
+          { id: 'automations', label: `Automations (${automations.length})` },
+          { id: 'log', label: `Log (${log.length})` },
+        ]}
+        activeTabId={activeTab}
+        onTabChange={(id) => setActiveTab(id as 'automations' | 'log')}
+      />
 
       {/* Content */}
       <div className="flex flex-1 overflow-hidden">
@@ -462,7 +455,7 @@ export default function AutomationApp() {
                             onClick={() => removeAction(idx)}
                             className="cursor-pointer text-[9px] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--destructive))]"
                           >
-                            ×
+                            <Icon name="xmark" size={10} />
                           </button>
                         </div>
                         {Object.entries(action.params).map(([key, val]) => (
@@ -522,9 +515,12 @@ export default function AutomationApp() {
               )}
 
               {automations.length === 0 && (
-                <p className="text-center py-4 text-xs text-[hsl(var(--muted-foreground))]">
-                  No automations. Create one or use a template.
-                </p>
+                <EmptyState
+                  icon={<Icon name="settings" size="sm" />}
+                  title="No automations"
+                  description="Create one or use a template."
+                  className="py-4"
+                />
               )}
 
               {automations.map((auto) => (
@@ -535,10 +531,10 @@ export default function AutomationApp() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => runAutomation(auto)}
-                      className="cursor-pointer rounded-md bg-[hsl(var(--accent))] px-2 py-0.5 text-[9px] font-medium text-[hsl(var(--accent-foreground))] hover:opacity-90"
+                      className="cursor-pointer rounded-md bg-[hsl(var(--accent))] px-2 py-0.5 text-[9px] font-medium text-[hsl(var(--accent-foreground))] hover:opacity-90 flex items-center gap-1"
                       title="Run now"
                     >
-                      ▶ Run
+                      <Icon name="play" size={10} /> Run
                     </button>
                     <div className="flex-1 min-w-0">
                       <div className="truncate text-xs font-medium text-[hsl(var(--foreground))]">{auto.name}</div>
@@ -560,14 +556,14 @@ export default function AutomationApp() {
                       className="cursor-pointer rounded p-0.5 text-[9px] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
                       title="Edit"
                     >
-                      ✏️
+                      <Icon name="edit" size={12} />
                     </button>
                     <button
                       onClick={() => deleteAutomation(auto.id)}
                       className="cursor-pointer rounded p-0.5 text-[9px] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--destructive))]"
                       title="Delete"
                     >
-                      ×
+                      <Icon name="xmark" size={12} />
                     </button>
                   </div>
                 </div>
@@ -589,7 +585,11 @@ export default function AutomationApp() {
         {activeTab === 'log' && (
           <div className="flex-1 overflow-y-auto p-2">
             {log.length === 0 ? (
-              <p className="text-center py-4 text-xs text-[hsl(var(--muted-foreground))]">No automation runs yet.</p>
+              <EmptyState
+                icon={<Icon name="clock" size="sm" />}
+                title="No automation runs yet"
+                className="py-4"
+              />
             ) : (
               log.map((entry) => (
                 <div key={entry.id} className="mb-1 rounded-md border border-[hsl(var(--border))] p-2">

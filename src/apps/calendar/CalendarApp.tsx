@@ -5,6 +5,8 @@ import {
   writeFile,
   createDirectory,
 } from '@/storage';
+import { Toolbar, ToolbarButton, Panel, Input, Modal, Button } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -247,28 +249,19 @@ export default function CalendarApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))] text-sm">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-1.5">
+      <Toolbar>
         {/* Navigation */}
-        <button
-          onClick={() => navigateMonth(-1)}
-          className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--foreground))]"
-        >
-          ←
-        </button>
-        <button
-          onClick={goToday}
-          className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--foreground))]"
-        >
-          Today
-        </button>
-        <button
-          onClick={() => navigateMonth(1)}
-          className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--foreground))]"
-        >
-          →
-        </button>
+        <ToolbarButton title="Previous" onClick={() => navigateMonth(-1)}>
+          <Icon name="chevron-left" size="sm" />
+        </ToolbarButton>
+        <ToolbarButton title="Today" onClick={goToday}>
+          <span className="text-xs">Today</span>
+        </ToolbarButton>
+        <ToolbarButton title="Next" onClick={() => navigateMonth(1)}>
+          <Icon name="chevron-right" size="sm" />
+        </ToolbarButton>
 
-        <span className="ml-2 text-xs font-semibold text-[hsl(var(--foreground))]">
+        <span className="ml-1 text-xs font-semibold text-[hsl(var(--foreground))]">
           {MONTHS[currentMonth]} {currentYear}
         </span>
 
@@ -276,28 +269,23 @@ export default function CalendarApp() {
 
         {/* View toggle */}
         {(['month', 'week', 'day'] as ViewMode[]).map((mode) => (
-          <button
+          <ToolbarButton
             key={mode}
+            title={mode.charAt(0).toUpperCase() + mode.slice(1)}
+            active={viewMode === mode}
             onClick={() => setViewMode(mode)}
-            className={`cursor-pointer rounded-md px-2 py-1 text-xs ${
-              viewMode === mode
-                ? 'bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]'
-                : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'
-            }`}
           >
-            {mode.charAt(0).toUpperCase() + mode.slice(1)}
-          </button>
+            <span className="text-xs">{mode.charAt(0).toUpperCase() + mode.slice(1)}</span>
+          </ToolbarButton>
         ))}
 
         <div className="flex-1" />
 
-        <button
-          onClick={() => openNewEvent()}
-          className="cursor-pointer rounded-md bg-[hsl(var(--accent))] px-2.5 py-1 text-xs font-medium text-[hsl(var(--accent-foreground))] hover:opacity-90"
-        >
-          + New Event
-        </button>
-      </div>
+        <ToolbarButton title="New Event" onClick={() => openNewEvent()}>
+          <Icon name="plus" size="sm" />
+          <span className="text-xs font-medium">New Event</span>
+        </ToolbarButton>
+      </Toolbar>
 
       {/* Calendar body */}
       <div className="flex flex-1 overflow-hidden">
@@ -721,17 +709,30 @@ function EventDetailPanel({
   const d = fromISODate(event.date);
 
   return (
-    <aside className="w-56 shrink-0 border-l border-[hsl(var(--border))] bg-[hsl(var(--surface))] flex flex-col">
-      <div className="flex items-center justify-between border-b border-[hsl(var(--border))] px-2.5 py-1.5">
-        <span className="text-[10px] font-medium uppercase text-[hsl(var(--muted-foreground))]">Event</span>
-        <button
-          onClick={onClose}
-          className="cursor-pointer text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
-        >
-          ×
-        </button>
-      </div>
-      <div className="flex-1 overflow-y-auto p-2.5">
+    <Panel
+      title="Event"
+      onClose={onClose}
+      width="w-56"
+      actions={
+        <div className="flex gap-1">
+          <button
+            onClick={() => onEdit(event)}
+            className="cursor-pointer text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text))] p-1 transition-colors"
+            title="Edit"
+          >
+            <Icon name="edit" size="sm" />
+          </button>
+          <button
+            onClick={() => onDelete(event.id)}
+            className="cursor-pointer text-[hsl(var(--destructive))] hover:text-[hsl(var(--destructive))] p-1 transition-colors"
+            title="Delete"
+          >
+            <Icon name="trash" size="sm" />
+          </button>
+        </div>
+      }
+    >
+      <div className="p-2.5">
         <div
           className="mb-2 h-1 w-8 rounded-full"
           style={{ backgroundColor: event.color }}
@@ -741,9 +742,7 @@ function EventDetailPanel({
         </h3>
         <div className="mt-2 space-y-1.5 text-xs text-[hsl(var(--muted-foreground))]">
           <div className="flex items-center gap-1.5">
-            <svg className="h-3 w-3 shrink-0" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1a6 6 0 110 12A6 6 0 018 2zm.5 3v3.293l2.354 2.353.707-.707L9.5 5.707V3h-1z" />
-            </svg>
+            <Icon name="clock" size={12} className="shrink-0 text-[hsl(var(--muted-foreground))]" />
             <span>
               {WEEKDAYS[d.getDay()]}, {MONTHS[d.getMonth()]} {d.getDate()}, {d.getFullYear()}
               {event.time && ` at ${formatTime(event.time)}`}
@@ -756,21 +755,7 @@ function EventDetailPanel({
           )}
         </div>
       </div>
-      <div className="border-t border-[hsl(var(--border))] p-2 flex gap-1.5">
-        <button
-          onClick={() => onEdit(event)}
-          className="flex-1 cursor-pointer rounded-md bg-[hsl(var(--accent))] px-2 py-1 text-[10px] font-medium text-[hsl(var(--accent-foreground))] hover:opacity-90"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(event.id)}
-          className="cursor-pointer rounded-md border border-[hsl(var(--destructive)/0.3)] px-2 py-1 text-[10px] text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive)/0.1)]"
-        >
-          Delete
-        </button>
-      </div>
-    </aside>
+    </Panel>
   );
 }
 
@@ -794,88 +779,78 @@ function EventFormModal({
   onCancel: () => void;
 }) {
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div
-        className="w-80 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--surface))] shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="border-b border-[hsl(var(--border))] px-3 py-2">
-          <h3 className="text-xs font-semibold text-[hsl(var(--foreground))]">
-            {isEditing ? 'Edit Event' : 'New Event'}
-          </h3>
-        </div>
-
-        <div className="space-y-2.5 p-3">
-          {/* Title */}
-          <input
-            type="text"
-            placeholder="Event title"
-            value={form.title}
-            onChange={(e) => onChange({ ...form, title: e.target.value })}
-            autoFocus
-            className="w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2.5 py-1.5 text-xs text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))]"
-            onKeyDown={(e) => e.key === 'Enter' && onSave()}
-          />
-
-          {/* Date & Time */}
-          <div className="flex gap-2">
-            <input
-              type="date"
-              value={form.date}
-              onChange={(e) => onChange({ ...form, date: e.target.value })}
-              className="flex-1 rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1.5 text-xs text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--accent))] [color-scheme:dark]"
-            />
-            <input
-              type="time"
-              value={form.time}
-              onChange={(e) => onChange({ ...form, time: e.target.value })}
-              placeholder="All day"
-              className="w-24 rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1.5 text-xs text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--accent))] [color-scheme:dark]"
-            />
-          </div>
-
-          {/* Description */}
-          <textarea
-            placeholder="Description (optional)"
-            value={form.description}
-            onChange={(e) => onChange({ ...form, description: e.target.value })}
-            rows={2}
-            className="w-full resize-none rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2.5 py-1.5 text-xs text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))]"
-          />
-
-          {/* Color picker */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-[hsl(var(--muted-foreground))]">Color</span>
-            {colors.map((c) => (
-              <button
-                key={c}
-                onClick={() => onChange({ ...form, color: c })}
-                className={`h-4 w-4 cursor-pointer rounded-full transition-transform duration-100 ${
-                  form.color === c ? 'scale-125 ring-2 ring-[hsl(var(--foreground))]' : ''
-                }`}
-                style={{ backgroundColor: c }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex justify-end gap-2 border-t border-[hsl(var(--border))] px-3 py-2">
-          <button
-            onClick={onCancel}
-            className="cursor-pointer rounded-md px-3 py-1 text-xs text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
-          >
-            Cancel
-          </button>
-          <button
+    <Modal
+      open
+      onClose={onCancel}
+      title={isEditing ? 'Edit Event' : 'New Event'}
+      className="w-80"
+      actions={
+        <>
+          <Button variant="ghost" size="sm" onClick={onCancel}>Cancel</Button>
+          <Button
+            variant="primary"
+            size="sm"
             onClick={onSave}
             disabled={!form.title.trim() || !form.date}
-            className="cursor-pointer rounded-md bg-[hsl(var(--accent))] px-3 py-1 text-xs font-medium text-[hsl(var(--accent-foreground))] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isEditing ? 'Save' : 'Create'}
-          </button>
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-2.5">
+        {/* Title */}
+        <Input
+          type="text"
+          placeholder="Event title"
+          value={form.title}
+          onChange={(value) => onChange({ ...form, title: value })}
+          autoFocus
+          onSubmit={onSave}
+          className="text-xs"
+        />
+
+        {/* Date & Time */}
+        <div className="flex gap-2">
+          <Input
+            type="date"
+            value={form.date}
+            onChange={(value) => onChange({ ...form, date: value })}
+            className="flex-1 text-xs [color-scheme:dark]"
+          />
+          <Input
+            type="time"
+            value={form.time}
+            onChange={(value) => onChange({ ...form, time: value })}
+            placeholder="All day"
+            className="w-24 text-xs [color-scheme:dark]"
+          />
+        </div>
+
+        {/* Description */}
+        <textarea
+          placeholder="Description (optional)"
+          value={form.description}
+          onChange={(e) => onChange({ ...form, description: e.target.value })}
+          rows={2}
+          className="w-full resize-none rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2.5 py-1.5 text-xs text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))]"
+        />
+
+        {/* Color picker */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] text-[hsl(var(--muted-foreground))]">Color</span>
+          {colors.map((c) => (
+            <button
+              key={c}
+              onClick={() => onChange({ ...form, color: c })}
+              className={`h-4 w-4 cursor-pointer rounded-full transition-transform duration-100 ${
+                form.color === c ? 'scale-125 ring-2 ring-[hsl(var(--foreground))]' : ''
+              }`}
+              style={{ backgroundColor: c }}
+            />
+          ))}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

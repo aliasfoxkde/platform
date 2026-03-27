@@ -12,6 +12,8 @@ import {
   baseName,
   parentPath,
 } from '@/storage';
+import { Toolbar, ToolbarButton, SearchInput, TabBar, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -425,39 +427,27 @@ export default function IDEApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[#1e1e1e]">
       {/* Toolbar */}
-      <div className="flex items-center gap-1 border-b border-[#333] bg-[#252526] px-2 py-0.5">
-        <ToolbarButton onClick={() => setShowSidebar(!showSidebar)} title="Toggle Sidebar">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M1 3h14v1H1V3zm0 3h14v1H1V6zm0 3h14v1H1V9zm0 3h14v1H1v-1z" />
-          </svg>
+      <Toolbar className="gap-1 border-[#333] bg-[#252526] px-2 py-0.5">
+        <ToolbarButton onClick={() => setShowSidebar(!showSidebar)} title="Toggle Sidebar" active={showSidebar}>
+          <Icon name="menu" size={14} />
         </ToolbarButton>
-        <ToolbarButton onClick={() => setShowSearch(!showSearch)} title="Search (Ctrl+P)">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 110-10 5 5 0 010 10z" />
-          </svg>
+        <ToolbarButton onClick={() => setShowSearch(!showSearch)} title="Search (Ctrl+P)" active={showSearch}>
+          <Icon name="search" size={14} />
         </ToolbarButton>
-        <ToolbarButton onClick={() => setShowTerminal(!showTerminal)} title="Toggle Terminal">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M2 3h12v10H2V3zm1 1v8h10V4H3zm1 1l2 2-2 2h1.5l2-2-2-2H4zm3.5 3h3v1h-3V8z" />
-          </svg>
+        <ToolbarButton onClick={() => setShowTerminal(!showTerminal)} title="Toggle Terminal" active={showTerminal}>
+          <Icon name="terminal" size={14} />
         </ToolbarButton>
 
         <div className="mx-1 h-4 w-px bg-[#444]" />
 
         <ToolbarButton onClick={createNewFile} title="New File (Ctrl+N)">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 1v14M1 8h14" stroke="currentColor" strokeWidth="2" fill="none" />
-          </svg>
+          <Icon name="plus" size={14} />
         </ToolbarButton>
         <ToolbarButton onClick={saveFile} title="Save (Ctrl+S)">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M2 1a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4.414a1 1 0 00-.293-.707L11.293 1.293A1 1 0 0010.586 1H2zm0 1h8.586L13 4.414V14H2V2zm1 1v5h6V3H3zm1 1h4v3H4V4zm2 7a1 1 0 100 2 1 1 0 000-2z" />
-          </svg>
+          <Icon name="save" size={14} />
         </ToolbarButton>
         <ToolbarButton onClick={refreshTree} title="Refresh File Tree">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 3a5 5 0 104.954 4.334.75.75 0 10-1.49-.164A3.5 3.5 0 118 11.5a3.493 3.493 0 01-2.586-1.146l.708-.708H4v2.121l.707-.707A4.997 4.997 0 008 3zm0 0V1.5L6.5 3 8 4.5V3z" />
-          </svg>
+          <Icon name="refresh" size={14} />
         </ToolbarButton>
 
         <div className="flex-1" />
@@ -467,7 +457,7 @@ export default function IDEApp() {
             {activeTab.language} — {baseName(activeTab.path)}
           </span>
         )}
-      </div>
+      </Toolbar>
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
@@ -508,31 +498,20 @@ export default function IDEApp() {
         <div className="flex flex-1 flex-col overflow-hidden">
           {/* Tabs */}
           {tabs.length > 0 && (
-            <div className="flex items-center border-b border-[#333] bg-[#2d2d2d] overflow-x-auto">
-              {tabs.map((tab, idx) => (
-                <div
-                  key={tab.path}
-                  onClick={() => handleTabSwitch(tab.path)}
-                  className={`group flex shrink-0 cursor-pointer items-center gap-1.5 border-r border-[#333] px-2.5 py-1 text-xs ${
-                    tab.path === activeTabPath
-                      ? 'bg-[#1e1e1e] text-[#fff] border-t-2 border-t-[#007acc]'
-                      : 'text-[#999] hover:bg-[#2a2a2a] border-t-2 border-t-transparent'
-                  }`}
-                >
-                  <span className="truncate max-w-[100px]">{tab.name}</span>
-                  {tab.modified && <span className="text-[#c5c5c5]">●</span>}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      closeTab(tab.path, idx);
-                    }}
-                    className="hidden group-hover:block ml-1 text-[#999] hover:text-[#fff] text-xs leading-none"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
+            <TabBar
+              tabs={tabs.map((tab) => ({
+                id: tab.path,
+                label: tab.name,
+                modified: tab.modified,
+              }))}
+              activeTabId={activeTabPath ?? ''}
+              onTabChange={handleTabSwitch}
+              onTabClose={(id) => {
+                const idx = tabs.findIndex((t) => t.path === id);
+                if (idx !== -1) closeTab(id, idx);
+              }}
+              className="border-b border-[#333] bg-[#2d2d2d]"
+            />
           )}
 
           {/* Editor */}
@@ -548,17 +527,11 @@ export default function IDEApp() {
                 theme="vs-dark"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-[#666]">
-                <div className="text-center">
-                  <div className="text-4xl mb-3 opacity-30">
-                    <svg className="h-16 w-16 mx-auto" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 01-.927-.928l.929-3.25a1.75 1.75 0 01.445-.758l8.61-8.61zm1.414 1.06a.25.25 0 00-.354 0L3.463 11.1a.25.25 0 00-.064.108l-.563 1.97 1.971-.564a.25.25 0 00.108-.063l8.61-8.61a.25.25 0 000-.354l-1.098-1.098z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm">No file open</p>
-                  <p className="mt-1 text-xs text-[#555]">Open a file from the sidebar or press Ctrl+N</p>
-                </div>
-              </div>
+              <EmptyState
+                icon={<Icon name="edit" size={32} />}
+                title="No file open"
+                description="Open a file from the sidebar or press Ctrl+N"
+              />
             )}
           </div>
 
@@ -571,7 +544,7 @@ export default function IDEApp() {
                   onClick={() => setShowTerminal(false)}
                   className="text-[#999] hover:text-[#fff] text-xs"
                 >
-                  ×
+                  <Icon name="xmark" size={12} />
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto px-2 py-1 font-mono text-xs">
@@ -620,30 +593,6 @@ export default function IDEApp() {
 }
 
 // ---------------------------------------------------------------------------
-// Toolbar Button
-// ---------------------------------------------------------------------------
-
-function ToolbarButton({
-  onClick,
-  title,
-  children,
-}: {
-  onClick: () => void;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className="cursor-pointer rounded p-1 text-[#ccc] transition-colors duration-100 hover:bg-[#444] hover:text-white"
-    >
-      {children}
-    </button>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // File Tree Panel
 // ---------------------------------------------------------------------------
 
@@ -672,18 +621,14 @@ function FileTreePanel({
             className="cursor-pointer rounded p-0.5 text-[#999] hover:text-[#fff]"
             title="Search files"
           >
-            <svg className="h-3 w-3" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 110-10 5 5 0 010 10z" />
-            </svg>
+            <Icon name="search" size={12} />
           </button>
           <button
             onClick={onRefresh}
             className="cursor-pointer rounded p-0.5 text-[#999] hover:text-[#fff]"
             title="Refresh"
           >
-            <svg className="h-3 w-3" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 3a5 5 0 104.954 4.334.75.75 0 10-1.49-.164A3.5 3.5 0 118 11.5a3.493 3.493 0 01-2.586-1.146l.708-.708H4v2.121l.707-.707A4.997 4.997 0 008 3z" />
-            </svg>
+            <Icon name="refresh" size={12} />
           </button>
         </div>
       </div>
@@ -744,13 +689,11 @@ function FileTreeNode({
       >
         {/* Chevron for directories */}
         {node.type === 'directory' ? (
-          <svg
-            className={`mr-0.5 h-3 w-3 shrink-0 text-[#ccc] transition-transform duration-100 ${expanded ? 'rotate-90' : ''}`}
-            viewBox="0 0 16 16"
-            fill="currentColor"
-          >
-            <path d="M6 3l5 5-5 5V3z" />
-          </svg>
+          <Icon
+            name="chevron-right"
+            size={12}
+            className={`mr-0.5 shrink-0 text-[#ccc] transition-transform duration-100 ${expanded ? 'rotate-90' : ''}`}
+          />
         ) : (
           <span className="mr-0.5 w-3 shrink-0" />
         )}
@@ -776,7 +719,7 @@ function FileTreeNode({
           className="ml-auto mr-1 hidden group-hover:block rounded p-0.5 text-[#999] hover:text-[#f44] hover:bg-[#333]"
           title="Delete"
         >
-          ×
+          <Icon name="xmark" size={12} />
         </button>
       </div>
 
@@ -826,19 +769,17 @@ function SearchPanel({
           onClick={onClose}
           className="cursor-pointer rounded p-0.5 text-[#999] hover:text-[#fff]"
         >
-          ×
+          <Icon name="xmark" size={12} />
         </button>
       </div>
       <div className="border-b border-[#333] p-1.5">
         <div className="flex gap-1">
-          <input
-            type="text"
-            placeholder="Search in files..."
+          <SearchInput
             value={query}
-            onChange={(e) => onQueryChange(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-            className="flex-1 rounded border border-[#444] bg-[#3c3c3c] px-1.5 py-1 text-xs text-[#ccc] placeholder:text-[#666] outline-none focus:border-[#007acc]"
-            autoFocus
+            onChange={onQueryChange}
+            placeholder="Search in files..."
+            className="flex-1 text-xs bg-[#3c3c3c] border-[#444]"
+            onKeyDown={(e) => { if (e.key === 'Enter') onSearch(); }}
           />
           <button
             onClick={onSearch}

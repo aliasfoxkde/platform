@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { exists, readFile, writeFile, createDirectory } from '@/storage';
+import { Toolbar, ToolbarButton, SearchInput, Modal, EmptyState, Button } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -170,70 +172,60 @@ export default function TaskManagerApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))] text-sm">
       {/* Header */}
-      <div className="shrink-0 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-4 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h2 className="text-sm font-semibold text-[hsl(var(--foreground))]">Tasks</h2>
-            <span className="text-xs text-[hsl(var(--muted-foreground))]">
-              {stats.done}/{stats.total} done
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {/* View toggle */}
-            <div className="flex rounded-md border border-[hsl(var(--border))]">
-              <button
-                onClick={() => setView('board')}
-                className={`cursor-pointer px-2 py-1 text-xs transition-colors ${
-                  view === 'board'
-                    ? 'bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]'
-                    : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'
-                }`}
-              >
-                Board
-              </button>
-              <button
-                onClick={() => setView('list')}
-                className={`cursor-pointer px-2 py-1 text-xs transition-colors ${
-                  view === 'list'
-                    ? 'bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]'
-                    : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'
-                }`}
-              >
-                List
-              </button>
-            </div>
-
-            {/* Filter */}
-            <select
-              value={filterPriority}
-              onChange={(e) => setFilterPriority(e.target.value as Priority | 'all')}
-              className="rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1 text-xs text-[hsl(var(--foreground))] outline-none"
-            >
-              <option value="all">All</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-
-            {/* Search */}
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-32 rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1 text-xs text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))]"
-            />
-
-            {/* New task */}
-            <button
-              onClick={() => setShowNewTask(true)}
-              className="cursor-pointer rounded-md bg-[hsl(var(--accent))] px-2.5 py-1 text-xs font-medium text-[hsl(var(--accent-foreground))] hover:opacity-90"
-            >
-              + New
-            </button>
-          </div>
+      <Toolbar className="px-4 py-2">
+        <div className="flex items-center gap-3">
+          <h2 className="text-sm font-semibold text-[hsl(var(--foreground))]">Tasks</h2>
+          <span className="text-xs text-[hsl(var(--muted-foreground))]">
+            {stats.done}/{stats.total} done
+          </span>
         </div>
-      </div>
+        <div className="flex-1" />
+        <div className="flex items-center gap-2">
+          {/* View toggle */}
+          <div className="flex rounded-md border border-[hsl(var(--border))]">
+            <ToolbarButton
+              onClick={() => setView('board')}
+              active={view === 'board'}
+              title="Board view"
+            >
+              <span className="px-1 text-xs">Board</span>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => setView('list')}
+              active={view === 'list'}
+              title="List view"
+            >
+              <span className="px-1 text-xs">List</span>
+            </ToolbarButton>
+          </div>
+
+          {/* Filter */}
+          <select
+            value={filterPriority}
+            onChange={(e) => setFilterPriority(e.target.value as Priority | 'all')}
+            className="rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1 text-xs text-[hsl(var(--foreground))] outline-none"
+          >
+            <option value="all">All</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+
+          {/* Search */}
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search..."
+            className="w-32"
+          />
+
+          {/* New task */}
+          <ToolbarButton onClick={() => setShowNewTask(true)} title="New task">
+            <Icon name="plus" size="sm" />
+            <span className="text-xs">New</span>
+          </ToolbarButton>
+        </div>
+      </Toolbar>
 
       {/* Progress bar */}
       <div className="shrink-0 px-4 py-1.5">
@@ -345,9 +337,11 @@ function BoardView({
                 <TaskCard key={task.id} task={task} onEdit={onEdit} onDelete={onDelete} />
               ))}
               {colTasks.length === 0 && (
-                <p className="px-2 py-6 text-center text-xs text-[hsl(var(--muted-foreground))]">
-                  No tasks
-                </p>
+                <EmptyState
+                  icon={<Icon name="file" size="sm" />}
+                  title="No tasks"
+                  className="py-6"
+                />
               )}
             </div>
 
@@ -385,9 +379,11 @@ function ListView({
   return (
     <div className="flex-1 overflow-y-auto p-3">
       {tasks.length === 0 ? (
-        <p className="py-12 text-center text-xs text-[hsl(var(--muted-foreground))]">
-          No tasks found
-        </p>
+        <EmptyState
+          icon={<Icon name="search" size="sm" />}
+          title="No tasks found"
+          className="py-12"
+        />
       ) : (
         <div className="space-y-1">
           {tasks.map((task) => (
@@ -430,9 +426,7 @@ function TaskCard({
           className="shrink-0 cursor-pointer rounded p-0.5 text-[hsl(var(--muted-foreground))] opacity-0 transition-opacity group-hover:opacity-100 hover:text-[hsl(var(--destructive))]"
           title="Delete"
         >
-          <svg className="h-3 w-3" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M4.646 4.646a.5.5 0 01.708 0L8 7.293l2.646-2.647a.5.5 0 01.708.708L8.707 8l2.647 2.646a.5.5 0 01-.708.708L8 8.707l-2.646 2.647a.5.5 0 01-.708-.708L7.293 8 4.646 5.354a.5.5 0 010-.708z" />
-          </svg>
+          <Icon name="xmark" size={12} />
         </button>
       </div>
       {task.description && (
@@ -509,27 +503,44 @@ function TaskForm({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center"
-      onClick={onCancel}
+    <Modal
+      open
+      onClose={onCancel}
+      title={task ? 'Edit Task' : 'New Task'}
+      actions={
+        <div className="flex gap-2 w-full">
+          {task && onDelete && (
+            <button
+              onClick={onDelete}
+              className="cursor-pointer rounded-md px-3 py-1.5 text-xs text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive)/0.1)]"
+            >
+              Delete
+            </button>
+          )}
+          <div className="flex-1" />
+          <button
+            onClick={onCancel}
+            className="cursor-pointer rounded-md border border-[hsl(var(--border))] px-3 py-1.5 text-xs text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="cursor-pointer rounded-md bg-[hsl(var(--accent))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--accent-foreground))] hover:opacity-90"
+          >
+            Save
+          </button>
+        </div>
+      }
     >
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div
-        className="relative w-full max-w-md rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--surface))] shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={handleKeyDown}
-      >
-        <div className="p-4 space-y-3">
-          <h3 className="text-sm font-semibold text-[hsl(var(--foreground))]">
-            {task ? 'Edit Task' : 'New Task'}
-          </h3>
-
+      <div className="space-y-3">
           <input
             ref={inputRef}
             type="text"
             placeholder="Task title..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))]"
           />
 
@@ -600,32 +611,7 @@ function TaskForm({
             </div>
           )}
 
-          <div className="flex justify-between pt-1">
-            {task && onDelete && (
-              <button
-                onClick={onDelete}
-                className="cursor-pointer rounded-md px-3 py-1.5 text-xs text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive)/0.1)]"
-              >
-                Delete
-              </button>
-            )}
-            <div className="flex gap-2 ml-auto">
-              <button
-                onClick={onCancel}
-                className="cursor-pointer rounded-md border border-[hsl(var(--border))] px-3 py-1.5 text-xs text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="cursor-pointer rounded-md bg-[hsl(var(--accent))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--accent-foreground))] hover:opacity-90"
-              >
-                Save
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

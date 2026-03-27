@@ -1,4 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
+import { Toolbar, Input, EmptyState } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -229,7 +231,7 @@ export default function APIExplorerApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))] text-sm">
       {/* URL Bar */}
-      <div className="flex items-center gap-1.5 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-2 py-1.5">
+      <Toolbar>
         {/* Method selector */}
         <select
           value={method}
@@ -242,13 +244,12 @@ export default function APIExplorerApp() {
         </select>
 
         {/* URL input */}
-        <input
-          type="text"
-          placeholder="https://api.example.com/endpoint"
+        <Input
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={setUrl}
+          placeholder="https://api.example.com/endpoint"
           onKeyDown={(e) => e.key === 'Enter' && sendRequest()}
-          className="flex-1 rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1 text-xs text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] outline-none focus:border-[hsl(var(--accent))] font-mono"
+          className="flex-1 text-xs font-mono"
         />
 
         {/* History button */}
@@ -257,10 +258,7 @@ export default function APIExplorerApp() {
           className="cursor-pointer rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--surface-bright))] px-2 py-1 text-xs text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
           title="History"
         >
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 3a5 5 0 100 10A5 5 0 008 3zM0 8a8 8 0 1116 0A8 8 0 010 8z" />
-            <path d="M8 4.5a.5.5 0 00-1 0v3.5h3.5a.5.5 0 000-1H8V4.5z" />
-          </svg>
+          <Icon name="history" size={14} />
         </button>
 
         {/* Send/Cancel */}
@@ -280,7 +278,7 @@ export default function APIExplorerApp() {
             Send
           </button>
         )}
-      </div>
+      </Toolbar>
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
@@ -402,16 +400,14 @@ export default function APIExplorerApp() {
           {/* Response content */}
           <div className="flex-1 overflow-y-auto">
             {!response && !loading && (
-              <div className="flex h-full items-center justify-center">
-                <div className="text-center">
-                  <div className="text-3xl mb-2 opacity-30">
-                    <svg className="h-12 w-12 mx-auto text-[hsl(var(--muted-foreground))]" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M0 2a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1v7.5a2.5 2.5 0 01-2.5 2.5h-9A2.5 2.5 0 011 12.5V5a1 1 0 01-1-1V2zm2 3v7.5A1.5 1.5 0 004.5 14h9a1.5 1.5 0 001.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" />
-                    </svg>
-                  </div>
-                  <p className="text-xs text-[hsl(var(--muted-foreground))]">Enter a URL and click Send</p>
-                </div>
-              </div>
+              <EmptyState
+                icon={
+                  <svg className="h-12 w-12 mx-auto text-[hsl(var(--muted-foreground))]" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M0 2a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1v7.5a2.5 2.5 0 01-2.5 2.5h-9A2.5 2.5 0 011 12.5V5a1 1 0 01-1-1V2zm2 3v7.5A1.5 1.5 0 004.5 14h9a1.5 1.5 0 001.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" />
+                  </svg>
+                }
+                title="Enter a URL and click Send"
+              />
             )}
 
             {loading && (

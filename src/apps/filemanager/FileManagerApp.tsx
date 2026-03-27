@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { listDirectory, createDirectory, deletePath } from '@/storage';
 import type { VFSEntry } from '@/storage';
+import { Toolbar, ToolbarButton, EmptyState, Input } from '@/ui/components';
+import { Icon } from '@/ui/icons';
 
 type ViewMode = 'grid' | 'list';
 
@@ -87,7 +89,7 @@ export default function FileManagerApp() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[hsl(var(--background))] text-sm">
       {/* Toolbar */}
-      <div className="flex shrink-0 items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-2">
+      <Toolbar className="gap-2 px-3 py-2">
         {/* Breadcrumb */}
         <nav className="flex flex-1 items-center gap-1 text-[hsl(var(--muted-foreground))]">
           {pathParts.map((part, i) => {
@@ -122,12 +124,7 @@ export default function FileManagerApp() {
                 : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'
             }`}
           >
-            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-              <rect x="1" y="1" width="5.5" height="5.5" rx="1" />
-              <rect x="9.5" y="1" width="5.5" height="5.5" rx="1" />
-              <rect x="1" y="9.5" width="5.5" height="5.5" rx="1" />
-              <rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1" />
-            </svg>
+            <Icon name="gallery" size="sm" />
           </button>
           <button
             onClick={() => setViewMode('list')}
@@ -138,11 +135,7 @@ export default function FileManagerApp() {
                 : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'
             }`}
           >
-            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-              <rect x="1" y="2" width="14" height="2" rx="0.5" />
-              <rect x="1" y="7" width="14" height="2" rx="0.5" />
-              <rect x="1" y="12" width="14" height="2" rx="0.5" />
-            </svg>
+            <Icon name="menu" size="sm" />
           </button>
         </div>
 
@@ -156,18 +149,17 @@ export default function FileManagerApp() {
             <path d="M14 4H8L7 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1zM8.5 9H7v1.5a.5.5 0 01-1 0V9H4.5a.5.5 0 010-1H6V6.5a.5.5 0 011 0V8h1.5a.5.5 0 010 1z" />
           </svg>
         </button>
-      </div>
+      </Toolbar>
 
       {/* New folder input */}
       {showNewFolder && (
         <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))] px-3 py-2">
-          <input
-            type="text"
+          <Input
             value={newFolderName}
-            onChange={(e) => setNewFolderName(e.target.value)}
+            onChange={setNewFolderName}
             onKeyDown={(e) => { if (e.key === 'Enter') handleNewFolder(); if (e.key === 'Escape') setShowNewFolder(false); }}
             placeholder="Folder name..."
-            className="flex-1 rounded-[var(--radius)] border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-2 py-1 text-xs text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--accent))]"
+            className="flex-1 text-xs"
             autoFocus
           />
           <button onClick={handleNewFolder} className="cursor-pointer rounded-[var(--radius)] bg-[hsl(var(--accent))] px-3 py-1 text-xs text-[hsl(var(--accent-foreground))] transition-colors duration-[var(--transition)] hover:opacity-90">
@@ -214,9 +206,10 @@ export default function FileManagerApp() {
 
           <div className="flex-1 overflow-y-auto p-3">
             {items.length === 0 ? (
-              <p className="text-center text-sm text-[hsl(var(--muted-foreground))]">
-                This folder is empty.
-              </p>
+              <EmptyState
+                icon={<Icon name="folder-open" size="lg" />}
+                title="This folder is empty"
+              />
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-1">
                 {items.map((item) => (
@@ -282,10 +275,7 @@ export default function FileManagerApp() {
                           className="cursor-pointer rounded px-1 text-[hsl(var(--muted-foreground))] opacity-0 transition-opacity duration-[var(--transition)] hover:text-[hsl(var(--destructive))] group-hover:opacity-100 [&:hover]:opacity-100"
                           title="Delete"
                         >
-                          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z" />
-                            <path fillRule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H5.5l1-1h3l1 1h2.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118z" />
-                          </svg>
+                          <Icon name="trash" size="xs" />
                         </button>
                       </td>
                     </tr>
