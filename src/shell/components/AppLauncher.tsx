@@ -79,6 +79,8 @@ export function AppLauncher() {
       {/* Panel */}
       <div
         data-app-launcher
+        role="dialog"
+        aria-label="Application launcher"
         className={clsx(
           'relative w-full max-w-2xl max-h-[70vh]',
           'glass-heavy rounded-2xl',
@@ -107,6 +109,7 @@ export function AppLauncher() {
             <input
               ref={inputRef}
               type="text"
+              aria-label="Search applications"
               className={clsx(
                 'w-full pl-10 pr-4 py-2.5 rounded-xl',
                 'bg-[hsl(var(--muted)/0.3)]',
@@ -125,10 +128,12 @@ export function AppLauncher() {
         </div>
 
         {/* Category Tabs */}
-        <div className="flex items-center gap-1 px-4 pb-2 overflow-x-auto">
+        <div className="flex items-center gap-1 px-4 pb-2 overflow-x-auto" role="tablist" aria-label="Application categories">
           {CATEGORY_TABS.map((tab) => (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={activeCategory === tab.id}
               className={clsx(
                 'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap',
                 'transition-colors duration-100 cursor-default',

@@ -231,6 +231,8 @@ export function Window({ windowId, children }: WindowProps) {
       <div
         ref={windowRef}
         data-window={windowId}
+        role="dialog"
+        aria-label={win.title}
         className={clsx(
           'absolute flex flex-col overflow-hidden',
           'rounded-[var(--radius-window)]',
@@ -270,6 +272,8 @@ export function Window({ windowId, children }: WindowProps) {
           )}
           onPointerDown={handleDragStart}
           onDoubleClick={handleTitleDoubleClick}
+          role="toolbar"
+          aria-label="Window controls"
         >
           {/* Traffic Lights */}
           <div className="flex items-center gap-1.5 -ml-0.5 mr-1 shrink-0">

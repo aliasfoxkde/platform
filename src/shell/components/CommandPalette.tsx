@@ -101,6 +101,8 @@ export function CommandPalette() {
       {/* Panel */}
       <div
         data-command-palette
+        role="dialog"
+        aria-label="Command palette"
         className={clsx(
           'relative w-full max-w-lg',
           'glass-heavy rounded-xl',
@@ -128,6 +130,7 @@ export function CommandPalette() {
           <input
             ref={inputRef}
             type="text"
+            aria-label="Search commands"
             className={clsx(
               'flex-1 bg-transparent border-none outline-none',
               'text-sm text-[hsl(var(--foreground))]',

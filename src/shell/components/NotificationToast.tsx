@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useNotificationStore } from '../stores/notificationStore';
 import clsx from 'clsx';
-import type { NotificationType } from '../types';
+import type { NotificationType, NotificationAction } from '../types';
 
 const TYPE_STYLES: Record<NotificationType, { bg: string; border: string; icon: string }> = {
   info: {
@@ -37,9 +37,9 @@ export function NotificationToast() {
   const notifications = useNotificationStore((s) => s.notifications);
   const dismissNotification = useNotificationStore((s) => s.dismissNotification);
 
-  // Sort by creation time, newest first (for stacking)
-  const sorted = useMemo(
-    () => [...notifications].sort((a, b) => b.createdAt - a.createdAt),
+  // Show only the 3 most recent active toasts
+  const visible = useMemo(
+    () => [...notifications].sort((a, b) => b.createdAt - a.createdAt).slice(0, 3),
     [notifications],
   );
 
@@ -50,13 +50,14 @@ export function NotificationToast() {
       aria-live="polite"
       aria-label="Notifications"
     >
-      {sorted.map((notif) => (
+      {visible.map((notif) => (
         <NotificationItem
           key={notif.id}
           id={notif.id}
           type={notif.type}
           title={notif.title}
           message={notif.message}
+          actions={notif.actions}
           onDismiss={dismissNotification}
         />
       ))}
@@ -69,12 +70,14 @@ function NotificationItem({
   type,
   title,
   message,
+  actions,
   onDismiss,
 }: {
   id: string;
   type: NotificationType;
   title: string;
   message?: string;
+  actions?: NotificationAction[];
   onDismiss: (id: string) => void;
 }) {
   const style = TYPE_STYLES[type];
@@ -83,6 +86,14 @@ function NotificationItem({
   const handleDismiss = useCallback(() => {
     onDismiss(id);
   }, [onDismiss, id]);
+
+  const handleAction = useCallback(
+    (action: NotificationAction) => {
+      action.onClick();
+      onDismiss(id);
+    },
+    [id, onDismiss],
+  );
 
   return (
     <div
@@ -119,6 +130,19 @@ function NotificationItem({
           <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))] leading-relaxed">
             {message}
           </p>
+        )}
+        {actions && actions.length > 0 && (
+          <div className="mt-2 flex gap-2">
+            {actions.map((action) => (
+              <button
+                key={action.label}
+                className="text-xs px-2 py-0.5 rounded-md bg-[hsl(var(--accent)/0.15)] text-[hsl(var(--accent))] hover:bg-[hsl(var(--accent)/0.25)] transition-colors duration-100"
+                onClick={() => handleAction(action)}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 

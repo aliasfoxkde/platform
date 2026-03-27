@@ -10,6 +10,7 @@ import { useThemeStore } from '../stores/themeStore';
 import { useWindowStore } from '../stores/windowStore';
 import { useAppStore } from '../stores/appStore';
 import { DesktopIcon } from './DesktopIcon';
+import { GlobalHotkeys } from './GlobalHotkeys';
 import type { DesktopIconState } from '../types';
 
 const GRID_SIZE = 90;
@@ -105,6 +106,8 @@ export function Desktop() {
   }, [wallpaper]);
 
   return (
+    <>
+    <GlobalHotkeys />
     <div
       ref={containerRef}
       data-desktop
@@ -186,6 +189,7 @@ export function Desktop() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

@@ -57,6 +57,12 @@ export interface DesktopIconState {
 /** Notification type for toast color coding. */
 export type NotificationType = 'info' | 'success' | 'warning' | 'error';
 
+/** An action button shown on a notification. */
+export interface NotificationAction {
+  label: string;
+  onClick: () => void;
+}
+
 /** A single notification. */
 export interface Notification {
   id: string;
@@ -65,6 +71,7 @@ export interface Notification {
   message?: string;
   duration?: number;
   createdAt: number;
+  actions?: NotificationAction[];
 }
 
 /** A command palette command. */

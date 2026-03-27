@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppStore } from '../stores/appStore';
 import { useWindowStore } from '../stores/windowStore';
 import { useThemeStore } from '../stores/themeStore';
+import { useNotificationStore } from '../stores/notificationStore';
+import { NotificationCenter } from './NotificationCenter';
 import clsx from 'clsx';
 
 const DOCK_ICON_SIZE = 48;
@@ -18,10 +20,14 @@ export function Dock() {
   const restoreWindow = useWindowStore((s) => s.restoreWindow);
   const theme = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
+  const notifications = useNotificationStore((s) => s.notifications);
+  const [ncOpen, setNcOpen] = useState(false);
 
   const dockRef = useRef<HTMLDivElement>(null);
   const [mouseX, setMouseX] = useState<number | null>(null);
   const [time, setTime] = useState(new Date());
+
+  const notifCount = notifications.length;
 
   // Clock tick
   useEffect(() => {
@@ -171,6 +177,27 @@ export function Dock() {
           'text-xs text-[hsl(var(--muted-foreground))]',
         )}
       >
+        {/* Notification Bell */}
+        <button
+          className="relative w-7 h-7 flex items-center justify-center rounded-md hover:bg-[hsl(var(--accent)/0.1)] transition-colors duration-150 cursor-default"
+          onClick={() => setNcOpen((v) => !v)}
+          aria-label={notifCount > 0 ? `${notifCount} notifications` : 'Notifications'}
+          title="Notifications"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          {notifCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] flex items-center justify-center rounded-full bg-[hsl(0_84%_60%)] text-white text-[0.6rem] font-bold leading-none px-1">
+              {notifCount > 9 ? '9+' : notifCount}
+            </span>
+          )}
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-4 bg-[hsl(var(--border))]" />
+
         {/* Theme Toggle */}
         <button
           className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[hsl(var(--accent)/0.1)] transition-colors duration-150 cursor-default"
@@ -208,6 +235,9 @@ export function Dock() {
           <span className="text-[0.65rem]">{formatDate(time)}</span>
         </div>
       </div>
+
+      {/* Notification Center Panel */}
+      <NotificationCenter isOpen={ncOpen} onClose={() => setNcOpen(false)} />
     </div>
   );
 }

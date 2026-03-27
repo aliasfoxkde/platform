@@ -54,6 +54,7 @@ interface NotificationState {
     title: string;
     message?: string;
     duration?: number;
+    actions?: Notification['actions'];
   }) => string;
   dismissNotification: (id: string) => void;
   clearAll: () => void;
@@ -66,7 +67,7 @@ interface NotificationState {
 export const useNotificationStore = create<NotificationState>((set) => ({
   notifications: [],
 
-  addNotification: ({ type = 'info', title, message, duration }) => {
+  addNotification: ({ type = 'info', title, message, duration, actions }) => {
     const id = generateId();
     const autoDismiss = duration ?? DEFAULT_DURATIONS[type];
 
@@ -77,6 +78,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
       message,
       duration: autoDismiss > 0 ? autoDismiss : undefined,
       createdAt: Date.now(),
+      actions,
     };
 
     set((state) => ({
