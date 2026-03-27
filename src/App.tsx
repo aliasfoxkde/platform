@@ -8,7 +8,8 @@ import { AppLauncher } from '@/shell/components/AppLauncher';
 import { useWindowStore } from '@/shell/stores/windowStore';
 import { useThemeStore } from '@/shell/stores/themeStore';
 import { resolveAppComponent } from '@/shell/appRegistry';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { initStorage } from '@/storage';
 
 function AppLoadingFallback() {
   return (
@@ -39,12 +40,26 @@ function WindowContent({ appId }: { appId: string }) {
 
 export default function App() {
   const windows = useWindowStore((s) => s.windows);
-  const setTheme = useThemeStore((s) => s.setTheme);
+  const theme = useThemeStore((s) => s.theme);
+  const [ready, setReady] = useState(false);
 
-  // Initialize theme on mount
+  // Initialize storage and hydrate persisted state
   useEffect(() => {
-    setTheme('dark');
-  }, [setTheme]);
+    initStorage().then(() => setReady(true));
+  }, []);
+
+  // Sync theme attribute (after hydration from IndexedDB)
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  if (!ready) {
+    return (
+      <div className="flex items-center justify-center w-full h-full bg-[hsl(var(--background))]">
+        <div className="w-5 h-5 border-2 border-[hsl(var(--accent))] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-full overflow-hidden">

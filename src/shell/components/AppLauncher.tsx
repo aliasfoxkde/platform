@@ -16,14 +16,10 @@ const CATEGORY_TABS: { id: FilterCategory; label: string }[] = [
   { id: 'games', label: 'Games' },
 ];
 
-interface AppLauncherProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function AppLauncher({ isOpen, onClose }: AppLauncherProps) {
+export function AppLauncher() {
   const apps = useAppStore((s) => s.apps);
   const openWindow = useWindowStore((s) => s.openWindow);
+  const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('all');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,18 +43,18 @@ export function AppLauncher({ isOpen, onClose }: AppLauncherProps) {
   const handleAppClick = useCallback(
     (appId: string) => {
       openWindow(appId);
-      onClose();
+      setIsOpen(false);
     },
-    [openWindow, onClose],
+    [openWindow],
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        setIsOpen(false);
       }
     },
-    [onClose],
+    [],
   );
 
   // Focus input when opened
@@ -74,7 +70,7 @@ export function AppLauncher({ isOpen, onClose }: AppLauncherProps) {
     <div
       data-app-launcher-overlay
       className="fixed inset-0 z-[9800] flex items-center justify-center"
-      onClick={onClose}
+      onClick={() => setIsOpen(false)}
       onKeyDown={handleKeyDown}
     >
       {/* Backdrop */}
