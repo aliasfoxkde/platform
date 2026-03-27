@@ -38,7 +38,11 @@ export interface WindowState {
   isMinimized: boolean;
   isMaximized: boolean;
   preMaximizeBounds?: { x: number; y: number; width: number; height: number };
+  snapZone?: SnapZone;
 }
+
+/** Snap zone positions. */
+export type SnapZone = 'none' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'maximized';
 
 /** Desktop icon position on the desktop grid. */
 export interface DesktopIconState {
