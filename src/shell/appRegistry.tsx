@@ -10,6 +10,7 @@ const appComponents: Record<string, ComponentType> = {
   about: lazy(() => import('@/apps/about/AboutApp')),
   monitor: lazy(() => import('@/apps/monitor/MonitorApp')),
   notes: lazy(() => import('@/apps/notes/NotesApp')),
+  tasks: lazy(() => import('@/apps/tasks/TaskManagerApp')),
 };
 
 /**
